@@ -110,11 +110,16 @@ def classify_referrer(url: str | None, *, own_host: str | None = None) -> Match 
     """
     if not url or not url.strip():
         return None
-    return _classify_referrer(url.strip(), normalize_host(own_host) if own_host else None)
+    host = _referrer_host(url.strip())
+    if host is None:
+        return None
+    if own_host is not None and host == normalize_host(own_host):
+        return None
+    return _match_host(host)
 
 
-@lru_cache(maxsize=8192)
-def _classify_referrer(url: str, own_host: str | None) -> Match | None:
+def _referrer_host(url: str) -> str | None:
+    """Parse a referrer URL down to its normalised host, or None if unusable."""
     try:
         parts = urlsplit(url)
         hostname = parts.hostname
@@ -122,9 +127,12 @@ def _classify_referrer(url: str, own_host: str | None) -> Match | None:
         return None
     if not parts.scheme or not hostname:
         return None
-    host = normalize_host(hostname)
-    if own_host is not None and host == own_host:
-        return None
+    return normalize_host(hostname)
+
+
+@lru_cache(maxsize=8192)
+def _match_host(host: str) -> Match | None:
+    """Look up a normalised host (and its parent domains) in the referrer index."""
     labels = host.split(".")
     index = _referrer_index()
     for start in range(len(labels) - 1):

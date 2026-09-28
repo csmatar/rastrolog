@@ -12,6 +12,7 @@ import re
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
+from functools import lru_cache
 from typing import Literal, Protocol
 from urllib.parse import unquote, urlsplit
 
@@ -95,7 +96,15 @@ def make_parser(fmt: Format) -> LineParser:
 
 
 def parse_clf_time(value: str) -> datetime:
-    """Parse ``28/Sep/2026:12:00:00 +0200`` to UTC without locale-dependent strptime."""
+    """Parse ``28/Sep/2026:12:00:00 +0200`` to UTC without locale-dependent strptime.
+
+    Cached: real logs repeat the same second across many requests.
+    """
+    return _parse_clf_time(value)
+
+
+@lru_cache(maxsize=4096)
+def _parse_clf_time(value: str) -> datetime:
     try:
         day, month, rest = value.split("/", 2)
         year, hour, minute, tail = rest.split(":", 3)
@@ -135,6 +144,8 @@ def _request_path(request: str) -> str:
 
 def _unescape(value: str) -> str:
     """Undo Apache (``\\"``) and nginx (``\\x22``) escaping inside quoted fields."""
+    if "\\" not in value:
+        return value
 
     def replace(match: re.Match[str]) -> str:
         escaped = match.group(1)
@@ -155,17 +166,28 @@ def _status(value: str) -> int:
 
 class CombinedParser:
     def parse(self, line: str) -> LogRecord | None:
-        match = _COMBINED.match(line)
-        if match is None:
-            raise MalformedLineError(line)
-        time_text, request, status, referrer, ua = match.groups()
-        return LogRecord(
-            ts=parse_clf_time(time_text),
-            path=_request_path(_unescape(request)),
-            status=_status(status),
-            ua=_dash(_unescape(ua)),
-            referrer=_dash(_unescape(referrer)),
-        )
+        return _parse_combined(line)
+
+
+@lru_cache(maxsize=4096)
+def _parse_combined(line: str) -> LogRecord:
+    """Parse one ``combined``-format line, memoised.
+
+    Bots and health checks repeat identical lines within a burst; caching on the
+    exact line is a no-op for genuinely unique traffic (a cache miss costs the
+    same as the uncached path) and a large win when lines repeat.
+    """
+    match = _COMBINED.match(line)
+    if match is None:
+        raise MalformedLineError(line)
+    time_text, request, status, referrer, ua = match.groups()
+    return LogRecord(
+        ts=parse_clf_time(time_text),
+        path=_request_path(_unescape(request)),
+        status=_status(status),
+        ua=_dash(_unescape(ua)),
+        referrer=_dash(_unescape(referrer)),
+    )
 
 
 class AlbParser:
