@@ -3,6 +3,7 @@ from typing import Any
 import pytest
 from helpers import REFERRER_CASES, UA_CASES
 
+from rastrolog import classify_referrer, classify_user_agent
 from rastrolog.signals import load_signals
 
 POSITIVE_KINDS = {"vendor", "observed", "token"}
@@ -32,3 +33,19 @@ def test_fixtures_only_reference_known_ids() -> None:
 def test_positive_ua_fixtures_cite_a_source(case: dict[str, Any]) -> None:
     assert case["kind"] in POSITIVE_KINDS
     assert case["source"].startswith("https://")
+
+
+def _expected_id(case: dict[str, Any]) -> str | None:
+    return case["expect"]["id"] if case["expect"] else None
+
+
+@pytest.mark.parametrize("case", UA_CASES, ids=lambda c: c["ua"][:70])
+def test_user_agent_fixture_classifies_as_expected(case: dict[str, Any]) -> None:
+    match = classify_user_agent(case["ua"])
+    assert (match.id if match else None) == _expected_id(case)
+
+
+@pytest.mark.parametrize("case", REFERRER_CASES, ids=lambda c: c["referrer"] or "<empty>")
+def test_referrer_fixture_classifies_as_expected(case: dict[str, Any]) -> None:
+    match = classify_referrer(case["referrer"])
+    assert (match.id if match else None) == _expected_id(case)
