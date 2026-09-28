@@ -12,7 +12,7 @@ Specs live in `docs/superpowers/specs/`, plans in `docs/superpowers/plans/`. Rea
 
 - `signals.json` at the repo root is the source of truth. Any change to it needs: a schema-valid entry verified against vendor docs, at least one positive fixture in `conformance/`, and a `CHANGELOG.md` entry. The only exception to vendor docs is an entry with `"vendor_documented": false` and a reputable third-party `docs_url` (currently Bytespider only), and it requires a human decision.
 - Python and TS classifiers must pass the same `conformance/` fixtures. Never special-case one language.
-- Core Python modules import only the standard library; `rich`/`typer` are allowed only in `cli.py` and `theme.py`.
+- Core Python modules import only the standard library; `rich`/`typer` are allowed only in `cli.py`, `render.py` and `theme.py`.
 - Host nothing, store nothing: no network calls from the snippet, no backend or proxy for the site, no cookies/localStorage.
 - Snippet budget: ≤ 2 KB gzipped.
 - The private planning note at the repo root is gitignored; never commit or quote it.
