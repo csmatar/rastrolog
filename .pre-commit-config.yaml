@@ -14,7 +14,9 @@ repos:
     hooks:
       - id: ruff
         args: [--fix]
+        exclude: ^docs/superpowers/ # historical specs/plans: leave embedded snippets as written
       - id: ruff-format
+        exclude: ^docs/superpowers/
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.38.2
     hooks:
