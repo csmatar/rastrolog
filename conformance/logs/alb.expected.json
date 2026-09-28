@@ -1,0 +1,162 @@
+{
+  "summary": {
+    "records": 14,
+    "skipped": 1,
+    "ai_crawler_requests": 7,
+    "ai_referral_visits": 0
+  },
+  "crawlers": [
+    {
+      "id": "openai-gptbot",
+      "vendor": "openai",
+      "vendor_name": "OpenAI",
+      "token": "GPTBot",
+      "purpose": "training",
+      "ai_specific": true,
+      "requests": 3,
+      "unique_pages": 2,
+      "last_seen": "2026-09-22T08:00:00+00:00",
+      "top_pages": [
+        {
+          "path": "/docs",
+          "count": 2
+        },
+        {
+          "path": "/pricing",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "anthropic-claudebot",
+      "vendor": "anthropic",
+      "vendor_name": "Anthropic",
+      "token": "ClaudeBot",
+      "purpose": "training",
+      "ai_specific": true,
+      "requests": 2,
+      "unique_pages": 2,
+      "last_seen": "2026-09-23T09:00:00+00:00",
+      "top_pages": [
+        {
+          "path": "/blog/ai-traffic",
+          "count": 1
+        },
+        {
+          "path": "/docs",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "google-googlebot",
+      "vendor": "google",
+      "vendor_name": "Google",
+      "token": "Googlebot",
+      "purpose": "search_index",
+      "ai_specific": false,
+      "requests": 1,
+      "unique_pages": 1,
+      "last_seen": "2026-09-24T11:00:00+00:00",
+      "top_pages": [
+        {
+          "path": "/docs",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "openai-chatgpt-user",
+      "vendor": "openai",
+      "vendor_name": "OpenAI",
+      "token": "ChatGPT-User",
+      "purpose": "user_fetch",
+      "ai_specific": true,
+      "requests": 1,
+      "unique_pages": 1,
+      "last_seen": "2026-09-23T10:00:00+00:00",
+      "top_pages": [
+        {
+          "path": "/pricing",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "perplexity-perplexitybot",
+      "vendor": "perplexity",
+      "vendor_name": "Perplexity",
+      "token": "PerplexityBot",
+      "purpose": "search_index",
+      "ai_specific": true,
+      "requests": 1,
+      "unique_pages": 1,
+      "last_seen": "2026-09-24T10:00:00+00:00",
+      "top_pages": [
+        {
+          "path": "/robots.txt",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "referrals": [],
+  "pages": [
+    {
+      "path": "/docs",
+      "crawler_requests": 3,
+      "referral_visits": 0,
+      "crawlers": [
+        {
+          "token": "GPTBot",
+          "count": 2
+        },
+        {
+          "token": "ClaudeBot",
+          "count": 1
+        }
+      ],
+      "referrals": []
+    },
+    {
+      "path": "/pricing",
+      "crawler_requests": 2,
+      "referral_visits": 0,
+      "crawlers": [
+        {
+          "token": "ChatGPT-User",
+          "count": 1
+        },
+        {
+          "token": "GPTBot",
+          "count": 1
+        }
+      ],
+      "referrals": []
+    },
+    {
+      "path": "/blog/ai-traffic",
+      "crawler_requests": 1,
+      "referral_visits": 0,
+      "crawlers": [
+        {
+          "token": "ClaudeBot",
+          "count": 1
+        }
+      ],
+      "referrals": []
+    },
+    {
+      "path": "/robots.txt",
+      "crawler_requests": 1,
+      "referral_visits": 0,
+      "crawlers": [
+        {
+          "token": "PerplexityBot",
+          "count": 1
+        }
+      ],
+      "referrals": []
+    }
+  ]
+}

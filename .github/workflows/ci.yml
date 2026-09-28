@@ -1,0 +1,66 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: python ${{ matrix.python }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    defaults:
+      run:
+        working-directory: python
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          python-version: ${{ matrix.python }}
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy
+      - run: uv run pytest --cov=rastrolog --cov-report=term-missing --cov-fail-under=90
+
+  package:
+    name: wheel bundles signals.json (python ${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.14"]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Build sdist and wheel (wheel is built from the sdist)
+        working-directory: python
+        run: uv build
+      - name: Wheel contains signals.json
+        working-directory: python
+        run: python3 -m zipfile -l dist/*.whl | grep -q "rastrolog/signals.json"
+      - name: Clean install runs the CLI and matches the golden report
+        run: |
+          uv venv --python ${{ matrix.python }} /tmp/clean
+          uv pip install --python /tmp/clean/bin/python python/dist/*.whl
+          /tmp/clean/bin/rastrolog parse conformance/logs/nginx.log --json > /tmp/report.json
+          python3 - <<'EOF'
+          import json, sys
+          got = json.load(open("/tmp/report.json"))
+          want = json.load(open("conformance/logs/nginx.expected.json"))
+          sys.exit(0 if got == want else "installed wheel disagrees with golden report")
+          EOF

@@ -34,3 +34,6 @@ js/core/src/*.gen.ts
 .DS_Store
 .idea/
 .vscode/
+
+# Build-time copy (canonical file is the repo-root signals.json)
+python/src/rastrolog/signals.json
