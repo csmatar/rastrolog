@@ -19,7 +19,7 @@ from urllib.parse import unquote, urlsplit
 Format = Literal["combined", "cloudfront", "alb"]
 FORMATS: tuple[Format, ...] = ("combined", "cloudfront", "alb")
 
-_QUOTED = r'"((?:[^"\\]|\\.)*)"'
+_QUOTED = r'"([^"\\]*(?:\\.[^"\\]*)*)"'
 _COMBINED = re.compile(
     r"^\S+ \S+ \S+ \[([^\]]+)\] " + _QUOTED + r" (\d{3}|-) \S+ " + _QUOTED + " " + _QUOTED
 )
@@ -166,28 +166,17 @@ def _status(value: str) -> int:
 
 class CombinedParser:
     def parse(self, line: str) -> LogRecord | None:
-        return _parse_combined(line)
-
-
-@lru_cache(maxsize=4096)
-def _parse_combined(line: str) -> LogRecord:
-    """Parse one ``combined``-format line, memoised.
-
-    Bots and health checks repeat identical lines within a burst; caching on the
-    exact line is a no-op for genuinely unique traffic (a cache miss costs the
-    same as the uncached path) and a large win when lines repeat.
-    """
-    match = _COMBINED.match(line)
-    if match is None:
-        raise MalformedLineError(line)
-    time_text, request, status, referrer, ua = match.groups()
-    return LogRecord(
-        ts=parse_clf_time(time_text),
-        path=_request_path(_unescape(request)),
-        status=_status(status),
-        ua=_dash(_unescape(ua)),
-        referrer=_dash(_unescape(referrer)),
-    )
+        match = _COMBINED.match(line)
+        if match is None:
+            raise MalformedLineError(line)
+        time_text, request, status, referrer, ua = match.groups()
+        return LogRecord(
+            ts=parse_clf_time(time_text),
+            path=_request_path(_unescape(request)),
+            status=_status(status),
+            ua=_dash(_unescape(ua)),
+            referrer=_dash(_unescape(referrer)),
+        )
 
 
 class AlbParser:
