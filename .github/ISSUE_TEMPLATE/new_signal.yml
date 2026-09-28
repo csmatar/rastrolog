@@ -1,0 +1,53 @@
+name: New AI bot or referrer
+description: A crawler or AI chat product rastrolog should detect (or a listed one that changed)
+title: "signals: "
+labels: ["signals"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        `signals.json` is the heart of rastrolog, so every entry needs a source we can verify.
+        Prefer to send the change yourself? See [CONTRIBUTING.md](https://github.com/csmatar/rastrolog/blob/main/CONTRIBUTING.md).
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of signal?
+      options:
+        - Crawler (appears in the User-Agent header)
+        - robots.txt-only token (never sent as a user agent)
+        - Referrer (an AI chat product sending human visitors)
+        - Change to an existing entry
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Vendor and token / product
+      placeholder: "Mistral AI — MistralAI-User"
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Source
+      description: "The vendor's own documentation page. If the vendor publishes nothing, a reputable third-party source (it will be flagged `vendor_documented: false`)."
+      placeholder: "https://docs.mistral.ai/robots"
+    validations:
+      required: true
+  - type: dropdown
+    id: purpose
+    attributes:
+      label: Purpose (crawlers only)
+      options:
+        - training
+        - user_fetch (fetches a page because a user asked)
+        - search_index
+        - not a crawler / not sure
+  - type: textarea
+    id: sample
+    attributes:
+      label: Real sample
+      description: A full User-Agent string from your logs or the vendor docs, or a referrer URL. Remove anything that identifies a visitor (IP addresses, query parameters with personal data).
+      render: text
+    validations:
+      required: true

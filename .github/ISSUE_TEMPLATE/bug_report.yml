@@ -1,0 +1,65 @@
+name: Bug report
+description: rastrolog parses, classifies or reports something incorrectly, or crashes
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug. A few log lines or a single user-agent/referrer string is
+        usually enough to reproduce it.
+
+        **Security issue?** Do **not** file it here. Report it privately via
+        [Security Advisories](https://github.com/csmatar/rastrolog/security/advisories/new)
+        (see [SECURITY.md](https://github.com/csmatar/rastrolog/blob/main/SECURITY.md)).
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight
+      options:
+        - label: I'm on the latest rastrolog release and this still reproduces.
+          required: true
+        - label: I searched existing issues and this isn't a duplicate.
+          required: true
+  - type: input
+    id: version
+    attributes:
+      label: rastrolog version
+      description: Output of `rastrolog --version`.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: OS and Python version
+      placeholder: "Ubuntu 24.04 / Python 3.12"
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where does it happen?
+      options:
+        - rastrolog parse
+        - rastrolog check
+        - Library (classify_user_agent / classify_referrer)
+        - ASGI middleware (FastAPI / Starlette)
+        - Django middleware
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: The command you ran and a few log lines (or the string you classified). Redact IP addresses and anything that identifies a visitor.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual
+      description: What you expected, and what rastrolog did instead (paste the output or traceback).
+    validations:
+      required: true

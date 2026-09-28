@@ -1,0 +1,30 @@
+name: Feature request
+description: Suggest an improvement to the CLI, library, middleware or log formats
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        rastrolog is a classifier and a checker, **kept small on purpose**. Hosted dashboards,
+        visitor identification, alerts that store data and server-side proxies are out of scope.
+        The `on_match` callback and `--json` output are there so you can build those on top.
+        New bots or referrers have their own form.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do, and what gets in the way today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What would you like rastrolog to do? A sample command or output helps.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Could the JSON output or the on_match callback cover this instead?

@@ -1,0 +1,19 @@
+# Code owners for csmatar/rastrolog
+#
+# Every pull request needs an approving review from an owner listed here before it can
+# merge into `main` (enforced by the "protect-main" ruleset: require_code_owner_review).
+# The last matching pattern wins.
+
+# Default owner for everything.
+*                     @csmatar
+
+# The product and the cross-language contract: changes here affect every consumer
+# (Python package, JS snippet, landing page), so keep them explicitly owned.
+/signals.json         @csmatar
+/signals.schema.json  @csmatar
+/conformance/         @csmatar
+
+# Supply chain: CI, release, Dependabot, ownership itself.
+/.github/             @csmatar
+/python/pyproject.toml @csmatar
+/python/hatch_build.py @csmatar
