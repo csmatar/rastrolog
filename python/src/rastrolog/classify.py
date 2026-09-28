@@ -86,20 +86,33 @@ def _referrer_index() -> dict[str, Match]:
     }
 
 
+#: Requests can carry arbitrarily long User-Agent/Referer values (or a hostile
+#: client can send one on purpose). Caching those would let the lru caches grow
+#: without bound in a long-running ASGI/Django process, so anything longer than
+#: this bypasses the cache and is classified directly, uncached.
+_MAX_CACHED_LEN = 512
+
+
 def classify_user_agent(ua: str | None) -> Match | None:
     """Classify a User-Agent header. Case-insensitive; longest token wins."""
     if not ua or not ua.strip():
         return None
+    if len(ua) > _MAX_CACHED_LEN:
+        return _classify_user_agent_impl(ua)
     return _classify_user_agent(ua)
 
 
-@lru_cache(maxsize=8192)
-def _classify_user_agent(ua: str) -> Match | None:
+def _classify_user_agent_impl(ua: str) -> Match | None:
     lowered = ua.lower()
     for token, match in _ua_index():
         if token in lowered:
             return match
     return None
+
+
+@lru_cache(maxsize=8192)
+def _classify_user_agent(ua: str) -> Match | None:
+    return _classify_user_agent_impl(ua)
 
 
 def classify_referrer(url: str | None, *, own_host: str | None = None) -> Match | None:
@@ -110,11 +123,14 @@ def classify_referrer(url: str | None, *, own_host: str | None = None) -> Match 
     """
     if not url or not url.strip():
         return None
-    return _classify_referrer(url.strip(), normalize_host(own_host) if own_host else None)
+    stripped = url.strip()
+    normalized_own_host = normalize_host(own_host) if own_host else None
+    if len(stripped) > _MAX_CACHED_LEN:
+        return _classify_referrer_impl(stripped, normalized_own_host)
+    return _classify_referrer(stripped, normalized_own_host)
 
 
-@lru_cache(maxsize=8192)
-def _classify_referrer(url: str, own_host: str | None) -> Match | None:
+def _classify_referrer_impl(url: str, own_host: str | None) -> Match | None:
     try:
         parts = urlsplit(url)
         hostname = parts.hostname
@@ -132,6 +148,11 @@ def _classify_referrer(url: str, own_host: str | None) -> Match | None:
         if match is not None:
             return match
     return None
+
+
+@lru_cache(maxsize=8192)
+def _classify_referrer(url: str, own_host: str | None) -> Match | None:
+    return _classify_referrer_impl(url, own_host)
 
 
 def classify_request(

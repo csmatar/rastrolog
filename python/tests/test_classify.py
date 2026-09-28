@@ -4,7 +4,7 @@ import pytest
 from helpers import SAMPLE_UA
 
 from rastrolog import Match, classify_referrer, classify_request, classify_user_agent
-from rastrolog.classify import _ua_index, normalize_host
+from rastrolog.classify import _MAX_CACHED_LEN, _classify_user_agent, _ua_index, normalize_host
 from rastrolog.signals import load_signals
 
 
@@ -131,3 +131,14 @@ def test_classify_request_falls_back_to_the_referral() -> None:
 
 def test_classify_request_with_nothing_is_none() -> None:
     assert classify_request(None, None) is None
+
+
+def test_long_user_agents_still_classify_but_bypass_the_cache() -> None:
+    padding = "x" * (600 - len("GPTBot")) + "GPTBot"
+    assert len(padding) == 600
+    assert len(padding) > _MAX_CACHED_LEN
+    before = _classify_user_agent.cache_info().currsize
+    match = classify_user_agent(padding)
+    assert match is not None
+    assert match.id == "openai-gptbot"
+    assert _classify_user_agent.cache_info().currsize == before
