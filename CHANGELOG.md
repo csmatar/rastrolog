@@ -7,6 +7,8 @@ under **Signals** so they're easy to scan when updating robots.txt.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-09-29
+
 ### Signals
 
 - Initial list: 28 crawler tokens (26 matched in user agents, 2 robots.txt-only)
