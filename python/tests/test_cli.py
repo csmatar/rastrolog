@@ -106,6 +106,30 @@ def test_unknown_format_shows_line_and_hint(tmp_path: Path) -> None:
     assert "--format" in result.stderr
 
 
+def test_unknown_format_path_with_markup_characters_renders_verbatim(
+    tmp_path: Path,
+) -> None:
+    """The full path can contain a ``[/x]``-shaped substring (e.g. a directory
+    named ``bad[`` holding a file named ``x].log``) even though no single
+    filename component may contain ``/``. Rendering that path must not crash
+    with a MarkupError, and must show it verbatim, unescaped."""
+    directory = tmp_path / "bad["
+    directory.mkdir()
+    log = directory / "x].log"
+    log.write_text("hello world\n")
+    result = runner.invoke(app, ["parse", str(log)])
+    assert result.exit_code == 2, result.stderr
+    assert "bad[/x].log" in result.stderr
+    assert "Unrecognised log format" in result.stderr
+
+
+def test_missing_file_with_markup_characters_renders_verbatim(tmp_path: Path) -> None:
+    missing = tmp_path / "bad[x].log"
+    result = runner.invoke(app, ["parse", str(missing)])
+    assert result.exit_code == 2
+    assert "bad[x].log" in result.stderr
+
+
 def test_explicit_format(tmp_path: Path) -> None:
     log = tmp_path / "mixed.log"
     log.write_text("garbage first line\n" + (LOGS / "nginx.log").read_text())
@@ -132,7 +156,7 @@ def test_verbose_logs_per_file_details_to_stderr() -> None:
 
 def test_no_nudge_when_output_is_not_a_terminal() -> None:
     result = runner.invoke(app, ["parse", str(LOGS / "nginx.log")])
-    assert "Get one email" not in result.stdout
+    assert "See how to follow changes" not in result.stdout
 
 
 def test_check_referrer() -> None:
@@ -164,3 +188,11 @@ def test_check_no_match_exits_1() -> None:
     result = runner.invoke(app, ["check", "https://www.google.com/"])
     assert result.exit_code == 1
     assert "no match" in result.stdout
+
+
+def test_check_does_not_crash_on_markup_looking_value() -> None:
+    """A value that looks like an unmatched rich closing tag must not crash the
+    CLI with a MarkupError; it should just report no match, verbatim."""
+    result = runner.invoke(app, ["check", "[/b]"])
+    assert result.exit_code == 1
+    assert "[/b]" in result.stdout

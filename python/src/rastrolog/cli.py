@@ -10,6 +10,7 @@ from typing import Annotated
 import typer
 from rich.console import Console
 from rich.logging import RichHandler
+from rich.markup import escape
 from rich.panel import Panel
 from rich.progress import (
     BarColumn,
@@ -120,7 +121,7 @@ def _consume(
         transient=True,
         disable=not err.is_terminal,
     ) as progress:
-        task = progress.add_task(path.name, total=size or None)
+        task = progress.add_task(escape(path.name), total=size or None)
 
         def on_progress(done: int) -> None:
             progress.update(task, completed=done)
@@ -161,7 +162,7 @@ def parse(
         raise typer.BadParameter(str(exc), param_hint="--since") from exc
     for path in files:
         if not path.is_file():
-            err.print(f"[err]✗[/] cannot read [bold]{path}[/]: file not found")
+            err.print(f"[err]✗[/] cannot read [bold]{escape(str(path))}[/]: file not found")
             raise typer.Exit(EXIT_USAGE)
 
     fmt: Format | None = log_format.value if log_format else None
@@ -176,7 +177,7 @@ def parse(
             err.print(
                 Panel(
                     Text(exc.line),
-                    title=f"[err]Unrecognised log format[/] in {path}",
+                    title=f"[err]Unrecognised log format[/] in {escape(str(path))}",
                     border_style="err",
                     expand=False,
                 )
@@ -184,7 +185,10 @@ def parse(
             err.print("Pass [accent]--format combined|cloudfront|alb[/] if it is one of those.")
             raise typer.Exit(EXIT_USAGE) from None
         except OSError as exc:
-            err.print(f"[err]✗[/] cannot read [bold]{path}[/]: {exc.strerror or exc}")
+            err.print(
+                f"[err]✗[/] cannot read [bold]{escape(str(path))}[/]: "
+                f"{escape(str(exc.strerror or exc))}"
+            )
             raise typer.Exit(EXIT_USAGE) from None
         log.debug(
             "parsed %s format=%s records=%d skipped=%d",
@@ -196,7 +200,10 @@ def parse(
         skipped += stats.skipped
         if stats.truncated:
             truncated = True
-            err.print(f"[warn]![/] {path} is truncated (gzip ended early); showing what was read.")
+            err.print(
+                f"[warn]![/] {escape(str(path))} is truncated (gzip ended early); "
+                "showing what was read."
+            )
 
     report = aggregator.result(top=top, skipped=skipped)
     if json_output:

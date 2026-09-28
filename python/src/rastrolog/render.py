@@ -20,8 +20,19 @@ def _when(ts: datetime) -> str:
     return ts.strftime("%Y-%m-%d %H:%M")
 
 
-def _pages(pages: Sequence[tuple[str, int]]) -> str:
-    return "\n".join(f"{path} ({count})" for path, count in pages[:TOP_PAGES_IN_CELL]) or "–"
+def _pages(pages: Sequence[tuple[str, int]]) -> Text:
+    """Render as a Text, never a plain str: paths come straight from the log and
+    must not be parsed as rich markup (a path can legitimately contain ``[`` or
+    ``]``, e.g. ``/blog/[slug]-8f2c.js``)."""
+    if not pages:
+        return Text("–")
+    cell = Text()
+    for i, (path, count) in enumerate(pages[:TOP_PAGES_IN_CELL]):
+        if i:
+            cell.append("\n")
+        cell.append(path)
+        cell.append(f" ({count})")
+    return cell
 
 
 def _pairs(pairs: Sequence[tuple[str, int]]) -> str:
@@ -115,7 +126,7 @@ def page_table(report: Report) -> Table | None:
     table.add_column("Referrals")
     for p in report.pages:
         table.add_row(
-            p.path,
+            Text(p.path),
             f"{p.crawler_requests:,}",
             f"{p.referral_visits:,}",
             _pairs(p.crawlers),
