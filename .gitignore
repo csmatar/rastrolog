@@ -1,0 +1,36 @@
+# Private planning notes (never publish)
+AI Traffic Lead Magnet*.md
+docs/private/
+
+# Claude Code local overrides
+.claude/settings.local.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# JS
+node_modules/
+.astro/
+.pnpm-store/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+
+# Generated
+js/core/src/*.gen.ts
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
