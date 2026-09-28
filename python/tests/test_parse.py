@@ -14,9 +14,17 @@ LINE = '203.0.113.7 - - [28/Sep/2026:12:00:00 +0000] "GET /docs HTTP/1.1" 200 10
     ("name", "fmt"),
     [("nginx", "combined"), ("apache", "combined"), ("cloudfront", "cloudfront"), ("alb", "alb")],
 )
-def test_fixture_logs_parse(name: str, fmt: str) -> None:
+@pytest.mark.parametrize("gz", [False, True], ids=["plain", "gz"])
+def test_fixture_logs_parse(name: str, fmt: str, gz: bool, tmp_path: Path) -> None:
+    source = LOGS / f"{name}.log"
+    if gz:
+        # No binary fixture committed: gzip the plain fixture at test time.
+        path = tmp_path / f"{name}.log.gz"
+        path.write_bytes(gzip.compress(source.read_bytes()))
+    else:
+        path = source
     stats = ParseStats()
-    records = list(iter_records(LOGS / f"{name}.log", stats=stats))
+    records = list(iter_records(path, stats=stats))
     assert stats.format == fmt
     assert (stats.records, stats.skipped, len(records)) == (14, 1, 14)
     assert records[-1].ua.count('"') in (0, 2)  # ALB fixture swaps quotes for apostrophes

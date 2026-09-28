@@ -1,10 +1,13 @@
+import gzip
 import json
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pytest
 from helpers import LOGS, SAMPLE_UA, load_json, report_for
 
 from rastrolog.formats import LogRecord
+from rastrolog.parse import ParseStats, iter_records
 from rastrolog.report import Aggregator, parse_since
 
 UTC = timezone.utc
@@ -130,9 +133,41 @@ def test_to_dict_shape() -> None:
     json.dumps(data)  # serialisable
 
 
+def test_to_dict_truncates_last_seen_to_whole_seconds() -> None:
+    """A microsecond-precision timestamp (e.g. from an ALB log, which carries
+    fractional seconds) must serialise to whole-second UTC, so the report JSON
+    is portable across implementations that don't preserve microseconds."""
+    aggregator = Aggregator()
+    aggregator.add(
+        LogRecord(
+            datetime(2026, 9, 1, 12, 0, 0, 123456, tzinfo=UTC),
+            "/",
+            200,
+            SAMPLE_UA["gptbot"],
+            "",
+        )
+    )
+    data = aggregator.result().to_dict()
+    assert data["crawlers"][0]["last_seen"] == "2026-09-01T12:00:00+00:00"
+
+
 @pytest.mark.parametrize("name", ALL_LOGS)
 def test_to_dict_matches_golden_file(name: str) -> None:
     assert report_for(name).to_dict() == load_json(LOGS / f"{name}.expected.json")
+
+
+@pytest.mark.parametrize("name", ALL_LOGS)
+def test_to_dict_matches_golden_file_when_gzipped(name: str, tmp_path: Path) -> None:
+    """The golden files are the cross-language contract; a gzipped copy of the
+    same fixture (no binary file committed -- built here at test time) must
+    aggregate to the exact same report as the plain one."""
+    packed = tmp_path / f"{name}.log.gz"
+    packed.write_bytes(gzip.compress((LOGS / f"{name}.log").read_bytes()))
+    stats = ParseStats()
+    aggregator = Aggregator()
+    aggregator.add_all(iter_records(packed, stats=stats))
+    report = aggregator.result(skipped=stats.skipped)
+    assert report.to_dict() == load_json(LOGS / f"{name}.expected.json")
 
 
 NOW = datetime(2026, 9, 28, 12, 0, tzinfo=UTC)
@@ -148,6 +183,8 @@ NOW = datetime(2026, 9, 28, 12, 0, tzinfo=UTC)
         ("7D", datetime(2026, 9, 21, 12, 0, tzinfo=UTC)),
         ("2026-09-01", datetime(2026, 9, 1, tzinfo=UTC)),
         ("2026-09-01T10:00:00+02:00", datetime(2026, 9, 1, 8, 0, tzinfo=UTC)),
+        ("2026-09-24T00:00:00Z", datetime(2026, 9, 24, 0, 0, tzinfo=UTC)),
+        ("2026-09-24T00:00:00z", datetime(2026, 9, 24, 0, 0, tzinfo=UTC)),
     ],
 )
 def test_parse_since(value: str, expected: datetime) -> None:

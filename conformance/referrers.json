@@ -1,7 +1,10 @@
 [
   { "referrer": "https://chatgpt.com/", "expect": { "id": "chatgpt" } },
   { "referrer": "https://chat.openai.com/", "expect": { "id": "chatgpt" } },
+  { "referrer": "https://ChatGPT.com:443/c/abc", "expect": { "id": "chatgpt" } },
+  { "referrer": "https://sub.chatgpt.com/", "expect": { "id": "chatgpt" } },
   { "referrer": "https://claude.ai/", "expect": { "id": "claude" } },
+  { "referrer": "https://claude.ai./", "expect": { "id": "claude" }, "note": "trailing dot on the host (a DNS absolute-name syntax) must not defeat the match" },
   { "referrer": "https://www.perplexity.ai/search?q=ai+traffic+logs", "expect": { "id": "perplexity" } },
   { "referrer": "https://pplx.ai/", "expect": { "id": "perplexity" } },
   { "referrer": "https://gemini.google.com/app", "expect": { "id": "gemini" } },
@@ -9,7 +12,7 @@
   { "referrer": "https://notebooklm.google.com/", "expect": { "id": "notebooklm" } },
   { "referrer": "https://copilot.microsoft.com/", "expect": { "id": "copilot" } },
   { "referrer": "https://copilot.com/", "expect": { "id": "copilot" } },
-  { "referrer": "https://you.com/search?q=rastrolog", "expect": { "id": "you" } },
+  { "referrer": "https://you.com/search?q=rastrolog", "expect": { "id": "you-com" } },
   { "referrer": "https://chat.mistral.ai/", "expect": { "id": "le-chat" } },
   { "referrer": "https://duck.ai/", "expect": { "id": "duck-ai" } },
   { "referrer": "https://www.meta.ai/", "expect": { "id": "meta-ai" } },
@@ -22,6 +25,10 @@
   { "referrer": "https://duckduckgo.com/", "expect": null, "note": "origin-only; Duck.ai now lives on duck.ai" },
   { "referrer": "https://example.com/blog/post", "expect": null },
   { "referrer": "https://chatgpt.com.evil.example/", "expect": null },
+  { "referrer": "https://notchatgpt.com/", "expect": null, "note": "substring match on a host label must not be treated as a subdomain match" },
+  { "referrer": "http://[::1", "expect": null, "note": "malformed IPv6 literal; urlsplit raises, we catch it and return null" },
+  { "referrer": "https://chatgpt.com\\@evil.com/", "expect": null, "note": "Python's urlsplit reads the host as evil.com (userinfo before an unescaped '@' is dropped); a WHATWG-compliant URL parser would read chatgpt.com instead. The contract here is null either way -- the TS port must match this behaviour, not resolve the ambiguity differently." },
   { "referrer": "chatgpt.com", "expect": null, "note": "no scheme" },
+  { "referrer": "https://chatgpt.com/", "own_host": "www.chatgpt.com", "expect": null, "note": "own_host: never a referral, even though chatgpt.com is otherwise a known AI referrer host" },
   { "referrer": "", "expect": null }
 ]

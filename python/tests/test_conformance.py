@@ -47,5 +47,5 @@ def test_user_agent_fixture_classifies_as_expected(case: dict[str, Any]) -> None
 
 @pytest.mark.parametrize("case", REFERRER_CASES, ids=lambda c: c["referrer"] or "<empty>")
 def test_referrer_fixture_classifies_as_expected(case: dict[str, Any]) -> None:
-    match = classify_referrer(case["referrer"])
+    match = classify_referrer(case["referrer"], own_host=case.get("own_host"))
     assert (match.id if match else None) == _expected_id(case)

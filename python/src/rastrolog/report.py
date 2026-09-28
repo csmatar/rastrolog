@@ -88,7 +88,7 @@ class Report:
                     "ai_specific": r.ai_specific,
                     "requests": r.requests,
                     "unique_pages": r.unique_pages,
-                    "last_seen": r.last_seen.isoformat(),
+                    "last_seen": r.last_seen.replace(microsecond=0).isoformat(),
                     "top_pages": _page_list(r.top_pages),
                 }
                 for r in self.crawlers
@@ -101,7 +101,7 @@ class Report:
                     "product": r.product,
                     "visits": r.visits,
                     "unique_pages": r.unique_pages,
-                    "last_seen": r.last_seen.isoformat(),
+                    "last_seen": r.last_seen.replace(microsecond=0).isoformat(),
                     "top_pages": _page_list(r.top_pages),
                 }
                 for r in self.referrals
@@ -255,8 +255,11 @@ def parse_since(value: str, *, now: datetime | None = None) -> datetime:
     if relative:
         amount, unit = int(relative.group(1)), relative.group(2).lower()
         return now - timedelta(**{_UNITS[unit]: amount})
+    text = value.strip()
+    if text.endswith(("Z", "z")):
+        text = text[:-1] + "+00:00"
     try:
-        parsed = datetime.fromisoformat(value.strip())
+        parsed = datetime.fromisoformat(text)
     except ValueError as exc:
         msg = f"invalid --since value {value!r}: use 30m, 24h, 7d, 2w or a date like 2026-09-01"
         raise ValueError(msg) from exc
