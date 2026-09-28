@@ -19,4 +19,16 @@ Specs live in `docs/superpowers/specs/`, plans in `docs/superpowers/plans/`. Rea
 
 ## Commands
 
-Filled in as each epic is scaffolded.
+Python (run from `python/`):
+
+```bash
+uv sync                       # create/update .venv from uv.lock
+uv run pytest                 # tests (perf smoke excluded; add `-m perf` to run it)
+uv run pytest --cov=rastrolog --cov-fail-under=90
+uv run ruff check . && uv run ruff format --check .
+uv run mypy                   # strict, src/ only
+uv run rastrolog parse ../conformance/logs/nginx.log
+uv build                      # sdist + wheel (bundles ../signals.json)
+```
+
+Pre-commit: `cd python && uv run pre-commit install` once; hooks run ruff, mypy, JSON/YAML checks, and the signals.json schema check.
