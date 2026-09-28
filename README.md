@@ -59,7 +59,7 @@ classify_referrer("https://www.google.com/")  # None
 
 ## What it detects
 
-The lists live in [`signals.json`](signals.json). Every entry is checked against the vendor's own documentation and has a real user-agent sample in [`conformance/`](conformance/).
+The lists live in [`signals.json`](signals.json). Crawler tokens cite the vendor's own documentation, except Bytespider (ByteDance publishes none, so that entry is flagged `vendor_documented: false` and sourced from a reputable third party instead). Referrer hosts cite either vendor docs or a published AI-source list from an analytics vendor (Matomo, Plausible). robots.txt-only tokens (`Google-Extended`, `Applebot-Extended`) never appear in a user agent string; they're read by the robots.txt checker, not by log classification. Every entry has a real fixture in [`conformance/`](conformance/).
 
 Known gaps, stated plainly:
 
