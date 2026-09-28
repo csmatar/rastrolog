@@ -81,6 +81,18 @@ def test_async_on_match_is_awaited() -> None:
     assert calls == ["openai-gptbot"]
 
 
+def test_failing_async_callback_is_logged_not_raised(caplog: pytest.LogCaptureFixture) -> None:
+    async def boom(match: Match, request: Any) -> None:
+        raise RuntimeError("down")
+
+    with override_settings(RASTROLOG={"on_match": boom}):
+        middleware = AITrafficMiddleware(async_ok)
+    with caplog.at_level(logging.WARNING, logger="rastrolog"):
+        response = asyncio.run(middleware(factory.get("/", HTTP_USER_AGENT=SAMPLE_UA["gptbot"])))
+    assert response.status_code == 200
+    assert "on_match callback failed" in caplog.text
+
+
 def test_failing_callback_is_logged_not_raised(caplog: pytest.LogCaptureFixture) -> None:
     def boom(match: Match, request: Any) -> None:
         raise RuntimeError("down")
