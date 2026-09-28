@@ -15,10 +15,12 @@ from pathlib import Path
 
 NUDGE_URL = "https://github.com/csmatar/rastrolog#get-notified-when-the-list-changes"
 NUDGE_TEXT = (
-    f"New AI bots show up every few months. Get one email when the list changes: {NUDGE_URL}"
+    f"New AI bots show up every few months. See how to follow changes to the list: {NUDGE_URL}"
 )
 OPT_OUT_ENV = "RASTROLOG_NO_NUDGE"
-_MARKER = "nudged"
+#: Versioned so a later release (e.g. once the email signup launches) can show
+#: one more nudge to people who already saw this one, by bumping the number.
+_MARKER = "nudged-1"
 
 
 def config_dir(

@@ -22,6 +22,13 @@ def test_nudge_shows_once(tmp_path: Path) -> None:
     assert not should_nudge(interactive=True, env={}, directory=tmp_path)
 
 
+def test_marker_file_is_versioned(tmp_path: Path) -> None:
+    """Versioned so a future release can add a one-off nudge (e.g. once the
+    email signup launches) without re-showing this one to everybody again."""
+    mark_nudged(tmp_path)
+    assert (tmp_path / "nudged-1").exists()
+
+
 def test_no_nudge_when_not_interactive(tmp_path: Path) -> None:
     assert not should_nudge(interactive=False, env={}, directory=tmp_path)
 
