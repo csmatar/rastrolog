@@ -34,3 +34,29 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run mypy
       - run: uv run pytest --cov=rastrolog --cov-report=term-missing --cov-fail-under=90
+
+  package:
+    name: wheel bundles signals.json
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+        with:
+          python-version: "3.12"
+      - name: Build sdist and wheel (wheel is built from the sdist)
+        working-directory: python
+        run: uv build
+      - name: Wheel contains signals.json
+        working-directory: python
+        run: python -m zipfile -l dist/*.whl | grep -q "rastrolog/signals.json"
+      - name: Clean install runs the CLI and matches the golden report
+        run: |
+          uv venv /tmp/clean
+          uv pip install --python /tmp/clean/bin/python python/dist/*.whl
+          /tmp/clean/bin/rastrolog parse conformance/logs/nginx.log --json > /tmp/report.json
+          python - <<'EOF'
+          import json, sys
+          got = json.load(open("/tmp/report.json"))
+          want = json.load(open("conformance/logs/nginx.expected.json"))
+          sys.exit(0 if got == want else "installed wheel disagrees with golden report")
+          EOF

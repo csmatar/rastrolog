@@ -32,3 +32,11 @@ uv build                      # sdist + wheel (bundles ../signals.json)
 ```
 
 Pre-commit: `cd python && uv run pre-commit install` once; hooks run ruff, mypy, JSON/YAML checks, and the signals.json schema check.
+
+## Releasing
+
+1. Bump `version` in `python/pyproject.toml` and run `cd python && uv lock`.
+2. In `CHANGELOG.md`, rename **Unreleased** to `[x.y.z] - YYYY-MM-DD` and start a new empty **Unreleased**.
+3. Merge to `main`, then tag `vX.Y.Z` and push the tag. `release.yml` checks that the tag matches the version, builds, and publishes to PyPI through trusted publishing.
+
+Never publish from a laptop. `uv publish`, `npm publish` and `pnpm publish` are denied in `.claude/settings.json`.

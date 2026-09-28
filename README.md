@@ -59,7 +59,7 @@ classify_referrer("https://www.google.com/")  # None
 
 ## What it detects
 
-The lists live in [`signals.json`](https://github.com/csmatar/rastrolog/blob/main/signals.json). Every entry is checked against the vendor's own documentation and has a real user-agent sample in [`conformance/`](https://github.com/csmatar/rastrolog/blob/main/conformance/).
+The lists live in [`signals.json`](signals.json). Every entry is checked against the vendor's own documentation and has a real user-agent sample in [`conformance/`](conformance/).
 
 Known gaps, stated plainly:
 
@@ -70,3 +70,17 @@ Known gaps, stated plainly:
 ## Get notified when the list changes
 
 New AI crawlers appear every few months, and your robots.txt goes out of date the day they do. Until the email signup page launches, watch this repo's releases (**Watch → Custom → Releases**). Every release that changes `signals.json` says what was added.
+
+## Contributing a new bot or referrer
+
+1. Add the entry to `signals.json`, with a `docs_url` pointing to the vendor's own page. If the vendor publishes nothing, a reputable third-party source is accepted, but the entry must also carry `"vendor_documented": false`.
+2. Add at least one real user-agent string (or referrer URL) to `conformance/`.
+3. Add a line under **Unreleased → Signals** in `CHANGELOG.md`.
+
+CI fails if step 2 is missing. That rule is what keeps the list trustworthy.
+
+## Scope
+
+This is a classifier and a checker, kept small on purpose. Use the callback and the JSON output to build what you need on top.
+
+MIT © Carlos Saldaña Matar
