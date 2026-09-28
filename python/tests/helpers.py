@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from rastrolog.report import Report
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 CONFORMANCE = REPO_ROOT / "conformance"
@@ -35,3 +38,14 @@ SAMPLE_UA = {
     "googlebot": _ua_for("google-googlebot"),
     "browser": _ua_for("browser-chrome"),
 }
+
+
+def report_for(name: str, **kwargs: Any) -> Report:
+    """Parse conformance/logs/<name>.log and aggregate it."""
+    from rastrolog.parse import ParseStats, iter_records
+    from rastrolog.report import Aggregator
+
+    stats = ParseStats()
+    aggregator = Aggregator(**kwargs)
+    aggregator.add_all(iter_records(LOGS / f"{name}.log", stats=stats))
+    return aggregator.result(skipped=stats.skipped)
