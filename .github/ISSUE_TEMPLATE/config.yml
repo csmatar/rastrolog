@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Report a security vulnerability
+    url: https://github.com/csmatar/rastrolog/security/advisories/new
+    about: Please report vulnerabilities privately here, never in a public issue.
+  - name: 📖 Documentation
+    url: https://github.com/csmatar/rastrolog#readme
+    about: Install, commands, middleware and what rastrolog detects.

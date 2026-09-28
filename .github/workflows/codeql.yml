@@ -1,0 +1,44 @@
+name: codeql
+
+# Static security analysis (SAST) for the Python package and for the GitHub
+# Actions workflows themselves. Findings appear in Security → Code scanning and
+# as PR annotations. Complements ruff/mypy (ci.yml) and zizmor (zizmor.yml).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "31 3 * * 1" # weekly re-scan picks up newly published queries
+
+permissions:
+  contents: read # default; the analyze job adds only what upload needs
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # checkout
+      actions: read # read workflow run metadata for the upload
+      security-events: write # upload results to code scanning
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python, actions]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none # pure Python / YAML: nothing to compile
+      - uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2 # v4.38.2
+        with:
+          category: "/language:${{ matrix.language }}"

@@ -1,5 +1,9 @@
 # rastrolog
 
+[![CI](https://github.com/csmatar/rastrolog/actions/workflows/ci.yml/badge.svg)](https://github.com/csmatar/rastrolog/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/rastrolog)](https://pypi.org/project/rastrolog/)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/csmatar/rastrolog/badge)](https://scorecard.dev/viewer/?uri=github.com/csmatar/rastrolog)
+
 **See which AI crawlers read your site and which AI chat products send you visitors.**
 
 `rastrolog` reads your access logs and prints two tables:

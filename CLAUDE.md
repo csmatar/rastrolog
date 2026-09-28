@@ -33,12 +33,19 @@ uv build                      # sdist + wheel (bundles ../signals.json)
 
 Pre-commit: `cd python && uv run pre-commit install` once; hooks run ruff, mypy, JSON/YAML checks, and the signals.json schema check.
 
+## Repository workflow and security
+
+- `main` is protected by the `protect-main` ruleset: changes land only through a PR, squash-merged, with a code-owner approval and green required checks (CI matrix, wheel checks, CodeQL, zizmor). Work on a branch; never push to `main`.
+- Every third-party action is pinned to a full commit SHA with a `# vX.Y.Z` comment; checkouts use `persist-credentials: false`; each job declares minimal, commented `permissions`. Run `uvx zizmor --persona=pedantic .github/` after touching a workflow; CI enforces it.
+- Dependabot bumps pinned actions and `python/uv.lock` weekly with a 7-day cooldown. CodeQL (Python + Actions) and OpenSSF Scorecard report to Security → Code scanning.
+- Vulnerabilities are reported privately (SECURITY.md); never discuss an unfixed vulnerability in a public issue or PR.
+
 ## Releasing
 
 1. Bump `version` in `python/pyproject.toml` and run `cd python && uv lock`.
 2. In `CHANGELOG.md`, rename **Unreleased** to `[x.y.z] - YYYY-MM-DD` and start a new empty **Unreleased**.
-3. Merge to `main`, then tag `vX.Y.Z` and push the tag. `release.yml` checks that the tag matches the version, builds, and publishes to PyPI through trusted publishing.
+3. Merge the PR to `main`, then tag `vX.Y.Z` on `main` and push the tag (only admins can create `v*` tags). `release.yml` checks that the tag matches the version, runs the tests, builds, and waits for a maintainer to approve the `pypi` deployment before publishing through trusted publishing.
 
-One-time setup (already done, documented for reference): a PyPI pending trusted publisher configured for owner `csmatar`, repo `rastrolog`, workflow `release.yml`, environment `pypi`; and a GitHub `pypi` environment on this repo.
+Configured (0.1.0 shipped with it): PyPI trusted publisher for owner `csmatar`, repo `rastrolog`, workflow `release.yml`, environment `pypi`; GitHub `pypi` environment with a required reviewer (`@csmatar`) and a `v*` tag rule.
 
 Never publish from a laptop. `uv publish`, `npm publish` and `pnpm publish` are denied in `.claude/settings.json`.

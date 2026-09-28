@@ -6,7 +6,7 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: read # read-only token for every job
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -24,7 +24,9 @@ jobs:
       run:
         working-directory: python
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           python-version: ${{ matrix.python }}
@@ -43,7 +45,9 @@ jobs:
       matrix:
         python: ["3.10", "3.14"]
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
         with:
           python-version: ${{ matrix.python }}
@@ -54,8 +58,10 @@ jobs:
         working-directory: python
         run: python3 -m zipfile -l dist/*.whl | grep -q "rastrolog/signals.json"
       - name: Clean install runs the CLI and matches the golden report
+        env:
+          PYTHON_VERSION: ${{ matrix.python }}
         run: |
-          uv venv --python ${{ matrix.python }} /tmp/clean
+          uv venv --python "$PYTHON_VERSION" /tmp/clean
           uv pip install --python /tmp/clean/bin/python python/dist/*.whl
           /tmp/clean/bin/rastrolog parse conformance/logs/nginx.log --json > /tmp/report.json
           python3 - <<'EOF'
