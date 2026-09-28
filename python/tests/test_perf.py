@@ -39,9 +39,14 @@ def _pool(filename: str, key: str) -> list[str]:
 
 
 def _referrer_and_ua_pools() -> tuple[list[str], list[str]]:
-    uas = _pool("user_agents.json", "ua")
-    browser_ua = next(u for u in uas if "Macintosh" in u and "Chrome" in u)
-    uas = [*uas, browser_ua]  # the brief calls for "plus the browser UA" explicitly
+    ua_cases = json.loads((CONFORMANCE / "user_agents.json").read_text(encoding="utf-8"))
+    uas = [case["ua"] for case in ua_cases]
+    # Picked by its fixture label, not by sniffing for "Macintosh"/"Chrome": several
+    # AI crawler UAs also contain those substrings (e.g. OAI-SearchBot), so that
+    # naive match previously picked a crawler, not an actual browser, as "the
+    # browser UA" the brief calls for adding to the pool.
+    browser_ua = next(case["ua"] for case in ua_cases if case.get("label") == "browser-chrome")
+    uas = [*uas, browser_ua]
     referrers = [*_pool("referrers.json", "referrer"), "-"]
     return uas, referrers
 
