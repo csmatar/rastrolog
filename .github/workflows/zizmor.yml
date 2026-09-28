@@ -1,0 +1,33 @@
+name: zizmor
+
+# Security linter for GitHub Actions: unpinned actions, template injection,
+# credential persistence, excessive permissions, cache poisoning, and more.
+# Runs on every PR (no path filter) so it can be a required status check.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read # checkout only; no findings are uploaded, the job fails instead
+
+concurrency:
+  group: zizmor-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  zizmor:
+    name: zizmor
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # checkout
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: zizmorcore/zizmor-action@cc914d7f3750a2d13d75c7f184a1060aa0e9d482 # v0.6.4
+        with:
+          version: "1.30.1"
+          persona: pedantic
+          advanced-security: false # fail the job on findings instead of uploading SARIF
