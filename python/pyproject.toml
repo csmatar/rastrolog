@@ -38,6 +38,9 @@ Homepage = "https://github.com/csmatar/rastrolog"
 Issues = "https://github.com/csmatar/rastrolog/issues"
 Changelog = "https://github.com/csmatar/rastrolog/blob/main/CHANGELOG.md"
 
+[project.scripts]
+rastrolog = "rastrolog.cli:app"
+
 [dependency-groups]
 dev = [
     "pytest>=9.0",
