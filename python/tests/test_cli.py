@@ -147,6 +147,19 @@ def test_check_user_agent_json() -> None:
     assert json.loads(result.stdout)["id"] == "anthropic-claudebot"
 
 
+def test_check_user_agent_with_doc_url_json() -> None:
+    result = runner.invoke(app, ["check", SAMPLE_UA["gptbot"], "--json"])
+    assert result.exit_code == 0
+    assert json.loads(result.stdout)["id"] == "openai-gptbot"
+
+
+def test_check_user_agent_with_doc_url_table() -> None:
+    result = runner.invoke(app, ["check", SAMPLE_UA["perplexitybot"]])
+    assert result.exit_code == 0
+    assert "PerplexityBot" in result.stdout
+    assert "AI crawler" in result.stdout
+
+
 def test_check_no_match_exits_1() -> None:
     result = runner.invoke(app, ["check", "https://www.google.com/"])
     assert result.exit_code == 1

@@ -3,6 +3,7 @@
 import enum
 import json
 import logging
+import re
 from pathlib import Path
 from typing import Annotated
 
@@ -33,6 +34,8 @@ from rastrolog.theme import THEME, purpose_badge
 EXIT_PARTIAL = 1
 EXIT_NO_MATCH = 1
 EXIT_USAGE = 2
+
+_URL = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*://\S+$")
 
 log = logging.getLogger("rastrolog")
 
@@ -213,8 +216,14 @@ def check(
     value: Annotated[str, typer.Argument(help="A User-Agent string or a referrer URL.")],
     json_output: Annotated[bool, typer.Option("--json", help="Print JSON.")] = False,
 ) -> None:
-    """Classify one user agent or referrer URL. Exits 1 when nothing matches."""
-    match = classify_referrer(value) if "://" in value else classify_user_agent(value)
+    """Classify one user agent or referrer URL. Exits 1 when nothing matches.
+
+    Treated as a referrer only when the whole value is a URL (a scheme at the
+    start, no whitespace anywhere); anything else, including a user agent
+    that happens to embed a ``+https://vendor/...`` doc pointer, is classified
+    as a user agent.
+    """
+    match = classify_referrer(value) if _URL.match(value.strip()) else classify_user_agent(value)
     if json_output:
         typer.echo(json.dumps(match.to_dict() if match else None))
     else:
