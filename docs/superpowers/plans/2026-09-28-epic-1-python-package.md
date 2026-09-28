@@ -436,14 +436,15 @@ git commit -m "chore: scaffold rastrolog Python package with uv, hatch hook, too
 - Produces:
   - `rastrolog.signals.load_signals() -> Signals` (cached) and `parse_signals(data: dict[str, Any]) -> Signals`
   - `Signals(schema_version: int, updated: str, crawlers: tuple[CrawlerSignal, ...], referrers: tuple[ReferrerSignal, ...])`
-  - `CrawlerSignal(id, vendor, vendor_name, token, match: Literal["user_agent","robots_only"], purpose: Literal["training","user_fetch","search_index"], ai_specific: bool, docs_url)`
+  - `CrawlerSignal(id, vendor, vendor_name, token, match: Literal["user_agent","robots_only"], purpose: Literal["training","user_fetch","search_index"], ai_specific: bool, docs_url, vendor_documented: bool = True)`
   - `ReferrerSignal(id, vendor, vendor_name, product, hosts: tuple[str, ...], source_url)`
   - `helpers.REPO_ROOT`, `helpers.CONFORMANCE`, `helpers.LOGS`, `helpers.load_json(path)`, `helpers.UA_CASES`, `helpers.REFERRER_CASES`, `helpers.SAMPLE_UA` (keys: `gptbot`, `chatgpt_user`, `claudebot`, `perplexitybot`, `googlebot`, `browser`)
 
 **Research notes (verified 2026-09-28; keep them in mind when reviewing PRs to the list):**
 - **Referrers are matched by host only.** bing.com (Copilot), x.com (Grok) and duckduckgo.com (Duck.ai) all send an origin-only `Referer`, so markers like `/chat` or `/i/grok` never reach the server. This is why the approved spec's `path_prefixes`/`query_markers` fields were removed. Those hosts are documented gaps.
 - **Anthropic publishes the token names but no full UA strings.** The ClaudeBot/Claude-User fixtures are marked `"kind": "observed"`, and Claude-SearchBot is `"kind": "token"`.
-- **Left out because no vendor documentation exists:** Bytespider (ByteDance publishes nothing), `cohere-ai` (Cohere says it runs no crawlers), and any Copilot-specific token (Microsoft publishes none; Copilot uses bingbot's index).
+- **Bytespider is included on a third-party source** (human decision, 2026-09-28). ByteDance publishes nothing, so the entry carries `"vendor_documented": false`. Its `docs_url` points to Dark Visitors, and the ai.robots.txt project independently lists it as LLM training that ignores robots.txt. `vendor_documented: false` is the only allowed exception to "vendor docs only", and it must stay visible in the data.
+- **Left out:** `cohere-ai` (Cohere says it runs no crawlers) and any Copilot-specific token (Microsoft publishes none; Copilot uses bingbot's index).
 - **Added beyond the planning list because vendors document them:** OAI-SearchBot variants, Google-Agent, Google-GeminiNotebook, Amzn-SearchBot, Amzn-User, meta-externalfetcher, meta-webindexer, MistralAI-User, MistralAI-Index, MistralAI-Training. Referrers added: NotebookLM, Duck.ai, DeepSeek.
 - **Applebot is `ai_specific: false`** because it powers Siri, Spotlight and Safari search. Its training opt-out is the robots-only `Applebot-Extended`.
 - **Vendors write tokens in mixed case** (`bingbot` and `meta-externalagent` are lowercase), which is why matching is case-insensitive.
@@ -557,6 +558,12 @@ def test_bundled_file_wins_over_repo_copy(tmp_path: Path, monkeypatch: pytest.Mo
     assert signals_module._read_raw() == '{"marker": "bundled"}'
 
 
+def test_third_party_sourced_entries_are_flagged_and_rare() -> None:
+    third_party = [c for c in load_signals().crawlers if not c.vendor_documented]
+    assert [c.id for c in third_party] == ["bytedance-bytespider"]
+    assert third_party[0].docs_url.startswith("https://darkvisitors.com/")
+
+
 def test_parse_signals_rejects_unknown_schema_version() -> None:
     with pytest.raises(ValueError, match="schema_version"):
         parse_signals({**RAW, "schema_version": 2})
@@ -639,6 +646,10 @@ Expected: collection error `FileNotFoundError: .../conformance/user_agents.json`
         "purpose": { "enum": ["training", "user_fetch", "search_index"] },
         "ai_specific": { "type": "boolean" },
         "docs_url": { "$ref": "#/$defs/https" },
+        "vendor_documented": {
+          "type": "boolean",
+          "description": "false when the vendor publishes nothing and docs_url is a third-party source. Omitted means true."
+        },
         "added": { "$ref": "#/$defs/date" }
       }
     },
@@ -687,6 +698,7 @@ Expected: collection error `FileNotFoundError: .../conformance/user_agents.json`
     { "id": "google-google-gemininotebook", "vendor": "google", "vendor_name": "Google", "token": "Google-GeminiNotebook", "match": "user_agent", "purpose": "user_fetch", "ai_specific": true, "docs_url": "https://developers.google.com/search/docs/crawling-indexing/google-user-triggered-fetchers", "added": "2026-09-28" },
     { "id": "microsoft-bingbot", "vendor": "microsoft", "vendor_name": "Microsoft", "token": "bingbot", "match": "user_agent", "purpose": "search_index", "ai_specific": false, "docs_url": "https://blogs.bing.com/webmaster/2022/4/Announcing-user-agent-change-for-Bing-crawler-bingbot/", "added": "2026-09-28" },
     { "id": "commoncrawl-ccbot", "vendor": "commoncrawl", "vendor_name": "Common Crawl", "token": "CCBot", "match": "user_agent", "purpose": "training", "ai_specific": true, "docs_url": "https://commoncrawl.org/ccbot", "added": "2026-09-28" },
+    { "id": "bytedance-bytespider", "vendor": "bytedance", "vendor_name": "ByteDance", "token": "Bytespider", "match": "user_agent", "purpose": "training", "ai_specific": true, "docs_url": "https://darkvisitors.com/agents/bytespider", "vendor_documented": false, "added": "2026-09-28" },
     { "id": "amazon-amazonbot", "vendor": "amazon", "vendor_name": "Amazon", "token": "Amazonbot", "match": "user_agent", "purpose": "training", "ai_specific": true, "docs_url": "https://developer.amazon.com/amazonbot", "added": "2026-09-28" },
     { "id": "amazon-amzn-searchbot", "vendor": "amazon", "vendor_name": "Amazon", "token": "Amzn-SearchBot", "match": "user_agent", "purpose": "search_index", "ai_specific": true, "docs_url": "https://developer.amazon.com/amazonbot", "added": "2026-09-28" },
     { "id": "amazon-amzn-user", "vendor": "amazon", "vendor_name": "Amazon", "token": "Amzn-User", "match": "user_agent", "purpose": "user_fetch", "ai_specific": true, "docs_url": "https://developer.amazon.com/amazonbot", "added": "2026-09-28" },
@@ -740,6 +752,7 @@ Expected: collection error `FileNotFoundError: .../conformance/user_agents.json`
   { "ua": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm) Chrome/W.X.Y.Z Safari/537.36", "expect": { "id": "microsoft-bingbot" }, "kind": "vendor", "source": "https://blogs.bing.com/webmaster/2022/4/Announcing-user-agent-change-for-Bing-crawler-bingbot/" },
   { "ua": "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/W.X.Y.Z Mobile Safari/537.36 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)", "expect": { "id": "microsoft-bingbot" }, "kind": "vendor", "source": "https://blogs.bing.com/webmaster/2022/4/Announcing-user-agent-change-for-Bing-crawler-bingbot/" },
   { "ua": "CCBot/2.0 (https://commoncrawl.org/faq/)", "expect": { "id": "commoncrawl-ccbot" }, "kind": "vendor", "source": "https://commoncrawl.org/ccbot" },
+  { "ua": "Mozilla/5.0 (Linux; Android 5.0) AppleWebKit/537.36 (KHTML, like Gecko) Mobile Safari/537.36 (compatible; Bytespider; spider-feedback@bytedance.com)", "expect": { "id": "bytedance-bytespider" }, "kind": "observed", "source": "https://darkvisitors.com/agents/bytespider" },
   { "ua": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Amazonbot/0.1) Chrome/W.X.Y.Z Safari/537.36", "expect": { "id": "amazon-amazonbot" }, "kind": "vendor", "source": "https://developer.amazon.com/amazonbot" },
   { "ua": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Amzn-SearchBot/0.1) Chrome/W.X.Y.Z Safari/537.36", "expect": { "id": "amazon-amzn-searchbot" }, "kind": "vendor", "source": "https://developer.amazon.com/amazonbot" },
   { "ua": "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; Amzn-User/0.1) Chrome/W.X.Y.Z Safari/537.36", "expect": { "id": "amazon-amzn-user" }, "kind": "vendor", "source": "https://developer.amazon.com/amazonbot" },
@@ -808,9 +821,10 @@ under **Signals** so they're easy to scan when updating robots.txt.
 
 ### Signals
 
-- Initial list: 27 crawler tokens (25 matched in user agents, 2 robots.txt-only)
-  across OpenAI, Anthropic, Perplexity, Google, Microsoft, Common Crawl, Amazon,
-  Apple, Meta, DuckDuckGo, You.com and Mistral AI; 12 AI referrer products.
+- Initial list: 28 crawler tokens (26 matched in user agents, 2 robots.txt-only)
+  across OpenAI, Anthropic, Perplexity, Google, Microsoft, Common Crawl, ByteDance,
+  Amazon, Apple, Meta, DuckDuckGo, You.com and Mistral AI; 12 AI referrer products.
+  Bytespider is sourced from third-party documentation (`vendor_documented: false`).
 
 ### Added
 
@@ -849,6 +863,7 @@ class CrawlerSignal:
     purpose: Purpose
     ai_specific: bool
     docs_url: str
+    vendor_documented: bool = True
 
 
 @dataclass(frozen=True, slots=True)
@@ -894,6 +909,7 @@ def parse_signals(data: dict[str, Any]) -> Signals:
                 purpose=c["purpose"],
                 ai_specific=c["ai_specific"],
                 docs_url=c["docs_url"],
+                vendor_documented=c.get("vendor_documented", True),
             )
             for c in data["crawlers"]
         ),
@@ -4172,7 +4188,7 @@ New AI crawlers appear every few months, and your robots.txt goes out of date th
 
 ## Contributing a new bot or referrer
 
-1. Add the entry to `signals.json`, with a `docs_url` pointing to the vendor's own page.
+1. Add the entry to `signals.json`, with a `docs_url` pointing to the vendor's own page. If the vendor publishes nothing, a reputable third-party source is accepted, but the entry must also carry `"vendor_documented": false`.
 2. Add at least one real user-agent string (or referrer URL) to `conformance/`.
 3. Add a line under **Unreleased → Signals** in `CHANGELOG.md`.
 
