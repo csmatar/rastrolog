@@ -38,14 +38,19 @@
       "Bash(gh pr list *)",
       "Bash(gh run view *)",
       "Bash(gh run list *)",
-      "Bash(gh run watch *)"
+      "Bash(gh run watch *)",
+      "Bash(uvx zizmor *)",
+      "Bash(gh pr checks *)"
     ],
     "deny": [
       "Bash(git push --force *)",
       "Bash(git push -f *)",
       "Bash(uv publish *)",
       "Bash(npm publish *)",
-      "Bash(pnpm publish *)"
+      "Bash(pnpm publish *)",
+      "Bash(git push origin main)",
+      "Bash(git push origin main *)",
+      "Bash(git push origin HEAD:main*)"
     ]
   }
 }
