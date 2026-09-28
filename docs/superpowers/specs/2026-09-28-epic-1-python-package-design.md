@@ -19,8 +19,8 @@ This epic also creates the shared foundation: `signals.json`, `signals.schema.js
 
 ## Dependencies
 
-- Runtime: `rich`, `typer`. Only `cli.py` and `theme.py` import them.
-- Everything else (`signals`, `classify`, `formats`, `parse`, `report`, `middleware/*`) imports **only the standard library**, so `from rastrolog import classify_referrer` in an app never needs rich or typer at import time.
+- Runtime: `rich`, `typer`. Only `cli.py`, `render.py` and `theme.py` import them.
+- Everything else (`signals`, `classify`, `formats`, `parse`, `report`, `nudge`, `middleware/*`) imports **only the standard library**, so `from rastrolog import classify_referrer` in an app never needs rich or typer at import time.
 - Optional extras `rastrolog[fastapi]` and `rastrolog[django]` exist for typing/tests; the middleware modules import Starlette/Django types only under `TYPE_CHECKING`.
 - No interactive prompt library (decision: flags only, no `questionary`).
 
@@ -67,7 +67,7 @@ def classify_referrer(url: str | None, *, own_host: str | None = None) -> Match 
 ```
 
 - UA: case-insensitive substring search over `match == "user_agent"` tokens, **longest token first** (so `ChatGPT-User` wins over any shorter overlapping token). Returns `None` for empty/None.
-- Referrer: `urllib.parse.urlsplit`; lowercase host; strip leading `www.`; exact host or dot-suffix match; then `path_prefixes` / `query_markers` if present. Returns `None` for malformed URLs, empty strings, and when host equals `own_host`.
+- Referrer: `urllib.parse.urlsplit`; lowercase host; strip leading `www.`; exact host or dot-suffix match (host only; see the overview spec for why). Returns `None` for malformed URLs, empty strings, and when host equals `own_host`.
 - `slots=True` requires Python 3.10+, which matches the floor.
 
 ### `formats.py` and `parse.py`

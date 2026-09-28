@@ -44,7 +44,7 @@ The log parser and robots.txt parser are added to `js/core` in Epic 3.
 ## `js/core`
 
 - **Codegen** runs before build/test. It emits compact typed tables (arrays of tuples, not the full JSON) so the snippet bundles only referrer data. Generated files are gitignored and rebuilt in CI.
-- `classifyReferrer(url: string, opts?: { ownHost?: string }): Match | null`, the same rules as Python (lowercase host, strip `www.`, exact or dot-suffix, then path/query markers). Uses `URL` in a try/catch.
+- `classifyReferrer(url: string, opts?: { ownHost?: string }): Match | null`, the same rules as Python (lowercase host, strip `www.` and a trailing dot, exact or dot-suffix host match). Uses `URL` in a try/catch.
 - `classifyUserAgent(ua: string): Match | null`: longest-token-first, case-insensitive.
 - `Match` uses camelCase (`vendorName`, `aiSpecific`); the conformance test compares on `id`, so naming differences don't matter.
 

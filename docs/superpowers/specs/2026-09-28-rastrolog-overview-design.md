@@ -90,8 +90,7 @@ rastrolog/
       "vendor_name": "OpenAI",
       "product": "ChatGPT",
       "hosts": ["chatgpt.com", "chat.openai.com"],
-      "path_prefixes": [],
-      "query_markers": [],
+      "source_url": "https://github.com/matomo-org/searchengine-and-social-list/blob/master/AIAssistants.yml",
       "added": "2026-09-28"
     }
   ]
@@ -103,10 +102,11 @@ Field rules:
 - `purpose` ∈ `training`, `user_fetch`, `search_index`.
 - `match` ∈ `user_agent` (appears in the UA header; matched in logs and middleware) or `robots_only` (a robots.txt control token that never appears in a UA, such as `Google-Extended` and `Applebot-Extended`; used only by the domain checker).
 - `ai_specific: false` marks general search crawlers (`Googlebot`, `Bingbot`) that are reported as a flag but never counted as AI traffic.
-- Referrer `hosts` match the exact host or any subdomain (dot-suffix). When `path_prefixes` or `query_markers` are non-empty, at least one must also match (e.g. `x.com` only with path `/i/grok`; `bing.com` only with `/chat` or a Copilot `form=` marker).
+- Referrer `hosts` match the exact host or any subdomain (dot-suffix), and each host belongs to exactly one entry. Matching is **by host only**. Research on 2026-09-28 found that the shared hosts bing.com (Copilot), x.com (Grok) and duckduckgo.com send origin-only referrers, so path markers like `/chat` or `/i/grok` never reach the server. Those hosts are documented gaps and are not listed. (Revised from the brainstormed `path_prefixes`/`query_markers` design.)
+- `source_url` cites where a referrer host was verified (vendor docs or an analytics vendor's published AI-source list such as Matomo's or Plausible's).
 - `id` is unique and stable; it is the key used in conformance fixtures and changelog entries.
 
-The starting list comes from the planning notes (OpenAI, Anthropic, Perplexity, Google, Microsoft, Bytespider, CCBot, Amazonbot, Applebot-Extended, Meta-ExternalAgent, cohere-ai, DuckAssistBot, YouBot; referrers ChatGPT, Claude, Perplexity, Gemini, Copilot, You.com, Mistral, DuckDuckGo AI chat, Meta AI, Grok). **Each entry is verified against the vendor's current published docs before it is committed**; an entry that can't be verified is left out, not guessed.
+**Each entry is verified against the vendor's current published docs before it is committed**; an entry that can't be verified is left out, not guessed. The verified starting list (2026-09-28) has 27 crawler tokens: OpenAI ×3, Anthropic ×3, Perplexity ×2, Google ×4 (including robots-only `Google-Extended`), Microsoft `bingbot`, Common Crawl `CCBot`, Amazon ×3, Apple ×2 (including robots-only `Applebot-Extended`), Meta ×3, DuckDuckGo, You.com and Mistral AI ×3. It also has 12 referrer products: ChatGPT, Claude, Perplexity, Gemini, NotebookLM, Copilot, You.com, Le Chat, Duck.ai, Meta AI, Grok and DeepSeek. Three candidates were left out for lack of vendor documentation: Bytespider, `cohere-ai`, and a Copilot-specific crawler token.
 
 Known, documented gap: Google AI Overviews and AI Mode send a plain `google.com` referrer. `rastrolog` does not guess; docs say so.
 
@@ -114,14 +114,14 @@ Known, documented gap: Google AI Overviews and AI Mode send a plain `google.com`
 
 `conformance/` is language-neutral JSON consumed by both test suites:
 
-- `user_agents.json`: `[{ "ua": "<real UA string>", "expect": { "id": "openai-gptbot" } | null, "source": "<vendor doc URL>" }]`
+- `user_agents.json`: `[{ "ua": "<UA string>", "expect": { "id": "openai-gptbot" } | null, "kind": "vendor" | "observed" | "token" | "negative", "source": "<vendor doc URL>" | null, "label"?: "browser-chrome" }]`. `vendor` means the vendor publishes the string verbatim. `observed` means the vendor documents the token but not the full string (Anthropic, for example). `token` means the vendor publishes only the token.
 - `referrers.json`: `[{ "referrer": "https://chatgpt.com/", "expect": { "id": "chatgpt" } | null }]`, including negatives (`https://www.google.com/`, same-host, malformed URLs, empty string).
 - `logs/<format>.log` + `logs/<format>.expected.json`: parser + report golden files.
 
 Invariants enforced by tests in **both** languages:
 
 1. `signals.json` validates against `signals.schema.json`.
-2. Every crawler with `match: "user_agent"` has at least one positive fixture in `user_agents.json` sourced from vendor docs.
+2. Every crawler with `match: "user_agent"` has at least one positive fixture in `user_agents.json` that cites the vendor's doc page (`kind` vendor, observed or token).
 3. Every referrer entry has at least one positive fixture in `referrers.json`.
 4. Every fixture classifies to its `expect` value.
 
