@@ -15,10 +15,11 @@ jobs:
       name: pypi
       url: https://pypi.org/project/rastrolog/
     permissions:
+      contents: read
       id-token: write
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
       - name: Tag matches package version
         working-directory: python
         run: |
@@ -27,9 +28,17 @@ jobs:
             echo "tag ${GITHUB_REF_NAME} does not match package version v${version}"
             exit 1
           fi
+      - name: Run test suite
+        working-directory: python
+        run: |
+          uv sync --locked
+          uv run pytest -q
       - name: Build
         working-directory: python
         run: uv build
+      - name: Wheel contains signals.json
+        working-directory: python
+        run: python3 -m zipfile -l dist/*.whl | grep -q "rastrolog/signals.json"
       - uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: python/dist

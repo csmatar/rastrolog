@@ -39,4 +39,6 @@ Pre-commit: `cd python && uv run pre-commit install` once; hooks run ruff, mypy,
 2. In `CHANGELOG.md`, rename **Unreleased** to `[x.y.z] - YYYY-MM-DD` and start a new empty **Unreleased**.
 3. Merge to `main`, then tag `vX.Y.Z` and push the tag. `release.yml` checks that the tag matches the version, builds, and publishes to PyPI through trusted publishing.
 
+One-time setup (already done, documented for reference): a PyPI pending trusted publisher configured for owner `csmatar`, repo `rastrolog`, workflow `release.yml`, environment `pypi`; and a GitHub `pypi` environment on this repo.
+
 Never publish from a laptop. `uv publish`, `npm publish` and `pnpm publish` are denied in `.claude/settings.json`.
