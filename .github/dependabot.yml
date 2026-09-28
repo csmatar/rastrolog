@@ -1,0 +1,38 @@
+# Keeps dependencies current without unpinning anything.
+# - github-actions: bumps the pinned SHA *and* its "# vX.Y.Z" comment, so action
+#   pins stay immutable and maintained. Majors are ignored: they get a deliberate
+#   manual bump and re-verification (zizmor + CI), not an automatic PR.
+# - uv: dev/test dependencies in python/uv.lock. Runtime deps are only rich and
+#   typer with lower bounds, so users are unaffected by lock bumps.
+# Both ecosystems wait 7 days after a release before proposing it (cooldown),
+# so a compromised release is usually caught and yanked before it reaches us.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "ci"
+    groups:
+      github-actions:
+        patterns: ["*"]
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "uv"
+    directory: "/python"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      python-dev:
+        patterns: ["*"]
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
