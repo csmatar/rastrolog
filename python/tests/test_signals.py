@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import jsonschema
@@ -36,6 +37,17 @@ def test_crawler_tokens_are_unique_ignoring_case() -> None:
 def test_crawler_ids_follow_the_naming_rule() -> None:
     for entry in RAW["crawlers"]:
         assert entry["id"] == f"{entry['vendor']}-{entry['token'].lower()}"
+
+
+def _slug(product: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", product.lower()).strip("-")
+
+
+def test_referrer_ids_follow_the_product_slug_rule() -> None:
+    """Referrer id = the product name lowercased, with runs of non-alphanumeric
+    characters collapsed to a single ``-`` and trimmed from the ends."""
+    for entry in RAW["referrers"]:
+        assert entry["id"] == _slug(entry["product"]), entry
 
 
 def test_referrer_hosts_are_claimed_once() -> None:
