@@ -32,8 +32,9 @@ export type Dispatcher = (w: AnalyticsWindow, source: string) => boolean;
 const ga4: Dispatcher = (w, source) => {
   const { gtag } = w;
   if (typeof gtag !== "function") return false;
-  gtag("event", "ai_referral", { ai_source: source });
+  // Set the user property first: it only applies to events sent after it.
   gtag("set", "user_properties", { ai_last_source: source });
+  gtag("event", "ai_referral", { ai_source: source });
   return true;
 };
 

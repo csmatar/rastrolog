@@ -74,7 +74,7 @@ The log parser and robots.txt parser are added to `js/core` in Epic 3.
 
 | # | Tool | Detected by | Call | Site-owner setup (documented in README) |
 | --- | --- | --- | --- | --- |
-| 1 | GA4 (gtag.js) | `typeof gtag === "function"` | `gtag("event","ai_referral",{ai_source})` then `gtag("set","user_properties",{ai_last_source})` | Register `ai_source` (event-scoped) and `ai_last_source` (user-scoped) as custom definitions to report on them; both show in DebugView without that |
+| 1 | GA4 (gtag.js) | `typeof gtag === "function"` | `gtag("set","user_properties",{ai_last_source})` then `gtag("event","ai_referral",{ai_source})` (the property only applies to later events) | Register `ai_source` (event-scoped) and `ai_last_source` (user-scoped) as custom definitions to report on them; both show in DebugView without that |
 | 2 | Plausible | `typeof plausible === "function"` | `plausible("AI Referral",{props:{source}})` | Add a custom-event goal named exactly `AI Referral`; allow the `source` custom property |
 | 3 | PostHog | `typeof posthog?.capture === "function"` | `posthog.capture("ai_referral",{source})` then `posthog.setPersonProperties?.({ai_last_source})` | None |
 | 4 | Fathom | `typeof fathom?.trackEvent === "function"` | `fathom.trackEvent("AI Referral - <source>")` (Fathom events carry no properties, so the source goes in the name) | None |

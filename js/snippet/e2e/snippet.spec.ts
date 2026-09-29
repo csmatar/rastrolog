@@ -51,8 +51,8 @@ test("GA4 receives ai_referral and the user property", async ({ page }) => {
     (window as unknown as { dataLayer: IArguments[] }).dataLayer.map((args) => Array.from(args)),
   );
   expect(calls).toEqual([
-    ["event", "ai_referral", { ai_source: "chatgpt" }],
     ["set", "user_properties", { ai_last_source: "chatgpt" }],
+    ["event", "ai_referral", { ai_source: "chatgpt" }],
   ]);
 });
 

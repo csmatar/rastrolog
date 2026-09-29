@@ -2,12 +2,14 @@ import { describe, expect, it, vi } from "vitest";
 import { type AnalyticsWindow, dispatch } from "../src/dispatch.js";
 
 describe("each tool", () => {
-  it("GA4 sends ai_referral and sets the user property", () => {
+  it("GA4 sets the user property first, so ai_referral itself carries it", () => {
+    // gtag("set", "user_properties") only applies to events sent after it; a
+    // visitor who bounces may never send another event.
     const gtag = vi.fn();
     expect(dispatch({ gtag }, "chatgpt", false)).toBe(1);
     expect(gtag.mock.calls).toEqual([
-      ["event", "ai_referral", { ai_source: "chatgpt" }],
       ["set", "user_properties", { ai_last_source: "chatgpt" }],
+      ["event", "ai_referral", { ai_source: "chatgpt" }],
     ]);
   });
 
