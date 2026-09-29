@@ -2,32 +2,28 @@ import type { RobotsRule } from "./parse.js";
 
 /**
  * RFC 9309 §2.2.3: "*" matches any sequence, a trailing "$" anchors the end,
- * and otherwise the pattern is a prefix. A greedy two-pointer wildcard match:
- * worst case O(pattern x path), never exponential, unlike a translated regex.
+ * and otherwise the pattern is a prefix. With "*" as the only wildcard, taking
+ * each literal piece at its leftmost occurrence is exact, and each piece is one
+ * indexOf, so matching stays near-linear even on hostile patterns.
  */
 export function patternMatches(pattern: string, path: string): boolean {
   const anchored = pattern.endsWith("$");
-  const p = anchored ? pattern.slice(0, -1) : `${pattern}*`;
-  let i = 0;
-  let j = 0;
-  let star = -1;
-  let mark = 0;
-  while (i < path.length) {
-    if (j < p.length && p[j] !== "*" && p[j] === path[i]) {
-      i++;
-      j++;
-    } else if (j < p.length && p[j] === "*") {
-      star = j++;
-      mark = i;
-    } else if (star !== -1) {
-      j = star + 1;
-      i = ++mark;
-    } else {
-      return false;
-    }
+  const pieces = (anchored ? pattern.slice(0, -1) : pattern).split("*");
+  const first = pieces[0] ?? "";
+  if (!path.startsWith(first)) return false;
+  const last = pieces.length - 1;
+  if (last === 0) return !anchored || path.length === first.length;
+  let at = first.length;
+  for (let k = 1; k < last; k++) {
+    const piece = pieces[k] ?? "";
+    if (piece === "") continue;
+    const found = path.indexOf(piece, at);
+    if (found < 0) return false;
+    at = found + piece.length;
   }
-  while (j < p.length && p[j] === "*") j++;
-  return j === p.length;
+  const tail = pieces[last] ?? "";
+  if (anchored) return path.length - tail.length >= at && path.endsWith(tail);
+  return tail === "" || path.indexOf(tail, at) >= 0;
 }
 
 /** RFC 9309 §2.2.2: the longest matching pattern wins; on a tie, allow wins. No match: allowed. */
