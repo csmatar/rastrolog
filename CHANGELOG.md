@@ -7,6 +7,14 @@ under **Signals** so they're easy to scan when updating robots.txt.
 
 ## [Unreleased]
 
+### Fixed
+
+- CloudFront: an encoded `%3F` or `%23` in `cs-uri-stem` is now kept as part of the path (`/a%3Fb` counts as `/a?b`) instead of truncating it; the stem is cut before it's percent-decoded, not after (#6).
+
+### Documentation
+
+- `conformance/README.md` now spells out every rule a port needs: referrer and `own_host` host normalisation, ordering inside `pages[]`, which crawlers the page pivot counts, absolute-form request targets, and CloudFront decoding. New edge-case fixtures pin sub-second `last_seen` truncation and CloudFront stem decoding (#6, #8).
+
 ## [0.1.1] - 2026-09-29
 
 ### Changed

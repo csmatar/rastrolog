@@ -1,0 +1,79 @@
+{
+  "summary": {
+    "records": 3,
+    "skipped": 0,
+    "ai_crawler_requests": 3,
+    "ai_referral_visits": 0
+  },
+  "crawlers": [
+    {
+      "id": "openai-gptbot",
+      "vendor": "openai",
+      "vendor_name": "OpenAI",
+      "token": "GPTBot",
+      "purpose": "training",
+      "ai_specific": true,
+      "requests": 2,
+      "unique_pages": 2,
+      "last_seen": "2026-09-20T08:15:30+00:00",
+      "top_pages": [
+        {
+          "path": "/docs",
+          "count": 1
+        },
+        {
+          "path": "/pricing",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "anthropic-claudebot",
+      "vendor": "anthropic",
+      "vendor_name": "Anthropic",
+      "token": "ClaudeBot",
+      "purpose": "training",
+      "ai_specific": true,
+      "requests": 1,
+      "unique_pages": 1,
+      "last_seen": "2026-09-21T09:00:00+00:00",
+      "top_pages": [
+        {
+          "path": "/docs",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "referrals": [],
+  "pages": [
+    {
+      "path": "/docs",
+      "crawler_requests": 2,
+      "referral_visits": 0,
+      "crawlers": [
+        {
+          "token": "ClaudeBot",
+          "count": 1
+        },
+        {
+          "token": "GPTBot",
+          "count": 1
+        }
+      ],
+      "referrals": []
+    },
+    {
+      "path": "/pricing",
+      "crawler_requests": 1,
+      "referral_visits": 0,
+      "crawlers": [
+        {
+          "token": "GPTBot",
+          "count": 1
+        }
+      ],
+      "referrals": []
+    }
+  ]
+}

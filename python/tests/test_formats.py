@@ -183,6 +183,23 @@ def test_cloudfront_without_header_uses_default_field_order() -> None:
     assert record.path == "/docs"
 
 
+@pytest.mark.parametrize(
+    ("stem", "path"),
+    [
+        ("/a%3Fb", "/a?b"),
+        ("/docs%23intro", "/docs#intro"),
+        ("/caf%C3%A9", "/caf\u00e9"),
+    ],
+)
+def test_cloudfront_decodes_the_stem_after_cutting_it(stem: str, path: str) -> None:
+    """``cs-uri-stem`` never holds a query or fragment (CloudFront logs the query
+    in ``cs-uri-query``), so an encoded ``%3F``/``%23`` is part of the path and
+    must survive decoding instead of truncating it."""
+    record = CloudFrontParser().parse(CF_LINE.replace("\t/docs\t", f"\t{stem}\t"))
+    assert record is not None
+    assert record.path == path
+
+
 def test_cloudfront_short_line_is_malformed() -> None:
     with pytest.raises(MalformedLineError):
         CloudFrontParser().parse("2026-09-28\t12:00:00\tLAX1")
