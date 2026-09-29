@@ -1,0 +1,9 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>callback</title>
+<script>
+  window.seen = [];
+  window.onAi = (traffic) => window.seen.push(["callback", traffic]);
+  addEventListener("rastrolog:match", (event) => window.seen.push(["event", event.detail]));
+</script>
+<script src="/snippet.min.js" data-callback="onAi" defer></script>
