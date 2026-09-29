@@ -1,0 +1,6 @@
+#Version: 1.0
+#Fields: date time x-edge-location sc-bytes c-ip cs-method cs(Host) cs-uri-stem sc-status cs(Referer) cs(User-Agent) cs-uri-query
+2026-09-20	08:00:00	LAX50-C1	5120	203.0.113.7	GET	d111111abcdef8.cloudfront.net	/a%3Fb	200	-	Mozilla/5.0%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko);%20compatible;%20GPTBot/1.4;%20+https://openai.com/gptbot	-
+2026-09-20	08:05:00	LAX50-C1	5120	203.0.113.7	GET	d111111abcdef8.cloudfront.net	/docs%23intro	200	-	Mozilla/5.0%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko);%20compatible;%20GPTBot/1.4;%20+https://openai.com/gptbot	-
+2026-09-20	08:10:00	LAX50-C1	5120	203.0.113.7	GET	d111111abcdef8.cloudfront.net	/caf%C3%A9	200	https://chatgpt.com/	Mozilla/5.0%20(Macintosh;%20Intel%20Mac%20OS%20X%2010_15_7)%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko)%20Chrome/141.0.0.0%20Safari/537.36	utm_source=chatgpt.com
+2026-09-20	08:20:00	LAX50-C1	5120	203.0.113.7	GET	d111111abcdef8.cloudfront.net	/pricing	200	https://chatgpt.com/	Mozilla/5.0%20(Macintosh;%20Intel%20Mac%20OS%20X%2010_15_7)%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko)%20Chrome/141.0.0.0%20Safari/537.36	utm_source=chatgpt.com

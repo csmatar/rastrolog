@@ -1,0 +1,102 @@
+{
+  "summary": {
+    "records": 4,
+    "skipped": 0,
+    "ai_crawler_requests": 2,
+    "ai_referral_visits": 2
+  },
+  "crawlers": [
+    {
+      "id": "openai-gptbot",
+      "vendor": "openai",
+      "vendor_name": "OpenAI",
+      "token": "GPTBot",
+      "purpose": "training",
+      "ai_specific": true,
+      "requests": 2,
+      "unique_pages": 2,
+      "last_seen": "2026-09-20T08:05:00+00:00",
+      "top_pages": [
+        {
+          "path": "/a?b",
+          "count": 1
+        },
+        {
+          "path": "/docs#intro",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "referrals": [
+    {
+      "id": "chatgpt",
+      "vendor": "openai",
+      "vendor_name": "OpenAI",
+      "product": "ChatGPT",
+      "visits": 2,
+      "unique_pages": 2,
+      "last_seen": "2026-09-20T08:20:00+00:00",
+      "top_pages": [
+        {
+          "path": "/caf\u00e9",
+          "count": 1
+        },
+        {
+          "path": "/pricing",
+          "count": 1
+        }
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "path": "/a?b",
+      "crawler_requests": 1,
+      "referral_visits": 0,
+      "crawlers": [
+        {
+          "token": "GPTBot",
+          "count": 1
+        }
+      ],
+      "referrals": []
+    },
+    {
+      "path": "/caf\u00e9",
+      "crawler_requests": 0,
+      "referral_visits": 1,
+      "crawlers": [],
+      "referrals": [
+        {
+          "product": "ChatGPT",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "path": "/docs#intro",
+      "crawler_requests": 1,
+      "referral_visits": 0,
+      "crawlers": [
+        {
+          "token": "GPTBot",
+          "count": 1
+        }
+      ],
+      "referrals": []
+    },
+    {
+      "path": "/pricing",
+      "crawler_requests": 0,
+      "referral_visits": 1,
+      "crawlers": [],
+      "referrals": [
+        {
+          "product": "ChatGPT",
+          "count": 1
+        }
+      ]
+    }
+  ]
+}

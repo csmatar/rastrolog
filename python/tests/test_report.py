@@ -13,6 +13,9 @@ from rastrolog.report import Aggregator, parse_since
 UTC = timezone.utc
 ALL_LOGS = ["nginx", "apache", "cloudfront", "alb"]
 WITH_REFERRERS = ["nginx", "apache", "cloudfront"]
+# Every golden file, including the small edge-case fixtures the hand-computed
+# tests above don't cover (alb-microseconds, cloudfront-encoded-stem).
+GOLDEN_LOGS = sorted(p.name.removesuffix(".expected.json") for p in LOGS.glob("*.expected.json"))
 
 
 @pytest.mark.parametrize("name", ALL_LOGS)
@@ -151,12 +154,17 @@ def test_to_dict_truncates_last_seen_to_whole_seconds() -> None:
     assert data["crawlers"][0]["last_seen"] == "2026-09-01T12:00:00+00:00"
 
 
-@pytest.mark.parametrize("name", ALL_LOGS)
+def test_every_log_fixture_has_a_golden_file() -> None:
+    assert sorted(p.stem for p in LOGS.glob("*.log")) == GOLDEN_LOGS
+    assert set(ALL_LOGS) <= set(GOLDEN_LOGS)
+
+
+@pytest.mark.parametrize("name", GOLDEN_LOGS)
 def test_to_dict_matches_golden_file(name: str) -> None:
     assert report_for(name).to_dict() == load_json(LOGS / f"{name}.expected.json")
 
 
-@pytest.mark.parametrize("name", ALL_LOGS)
+@pytest.mark.parametrize("name", GOLDEN_LOGS)
 def test_to_dict_matches_golden_file_when_gzipped(name: str, tmp_path: Path) -> None:
     """The golden files are the cross-language contract; a gzipped copy of the
     same fixture (no binary file committed -- built here at test time) must

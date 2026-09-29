@@ -6,7 +6,7 @@ from helpers import REFERRER_CASES, UA_CASES
 from rastrolog import classify_referrer, classify_user_agent
 from rastrolog.signals import load_signals
 
-POSITIVE_KINDS = {"vendor", "observed", "token"}
+POSITIVE_KINDS = {"vendor", "observed", "synthetic", "token"}
 
 
 def test_every_user_agent_crawler_has_a_positive_fixture() -> None:
@@ -33,6 +33,15 @@ def test_fixtures_only_reference_known_ids() -> None:
 def test_positive_ua_fixtures_cite_a_source(case: dict[str, Any]) -> None:
     assert case["kind"] in POSITIVE_KINDS
     assert case["source"].startswith("https://")
+
+
+@pytest.mark.parametrize(
+    "case", [c for c in UA_CASES if not c["expect"]], ids=lambda c: c.get("label", "?")
+)
+def test_negative_ua_fixtures_have_a_label_and_no_source(case: dict[str, Any]) -> None:
+    assert case["kind"] == "negative"
+    assert case["label"]
+    assert case["source"] is None
 
 
 def _expected_id(case: dict[str, Any]) -> str | None:

@@ -8,6 +8,8 @@
 
 **Tech Stack:** Python ≥ 3.10, uv, hatchling (custom build hook), rich, typer, pytest + pytest-cov, mypy `--strict`, ruff, jsonschema (tests only), starlette + django (tests only), pre-commit, GitHub Actions.
 
+> **Historical note:** this plan is kept as written. During review the You.com referrer id `"you"` shown below was renamed to `"you-com"` (#4); `signals.json` and `conformance/` are authoritative.
+
 **Spec:** `docs/superpowers/specs/2026-09-28-rastrolog-overview-design.md` and `docs/superpowers/specs/2026-09-28-epic-1-python-package-design.md`. Read both before starting. GitHub epic: #1.
 
 **Branch:** do all work on `epic-1-python` (created in Task 1), open a PR to `main` at the end.

@@ -225,7 +225,8 @@ class CloudFrontParser:
             raise MalformedLineError(line) from exc
         return LogRecord(
             ts=ts,
-            path=normalize_path(unquote(stem)),
+            # Cut first, then decode: an encoded %3F/%23 in the stem is part of the path.
+            path=unquote(normalize_path(stem)),
             status=_status(status),
             ua=_dash(unquote(ua)),
             referrer=_dash(unquote(referrer)),
