@@ -2,7 +2,8 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { gzipSync } from "node:zlib";
-import { expect, type Page, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { expect, test } from "./fixtures.ts";
 import { isolate, NGINX_LOG } from "./helpers.ts";
 
 const NGINX = readFileSync(NGINX_LOG);

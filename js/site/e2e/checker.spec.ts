@@ -1,4 +1,5 @@
-import { expect, type Page, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { expect, test } from "./fixtures.ts";
 import { COUNTS, isolate, LLMS_SAMPLE, ROBOTS_SAMPLE, serveSite } from "./helpers.ts";
 
 const N = COUNTS.crawlers;

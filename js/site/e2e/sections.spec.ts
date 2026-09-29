@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures.ts";
 import { COUNTS, SIGNALS } from "./helpers.ts";
 
 test.use({ permissions: ["clipboard-read", "clipboard-write"] });
