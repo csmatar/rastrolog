@@ -125,12 +125,6 @@ jobs:
           registry-url: https://registry.npmjs.org
           package-manager-cache: false
       - name: Publish the tarball built by the build job (no project code runs here)
-        env:
-          # First release only (v0.2.0): npm can't set up trusted publishing for a
-          # package that doesn't exist yet, so this one-day token (a secret of the
-          # `npm` environment) is used once. Remove this env block after the trusted
-          # publisher is configured; see CLAUDE.md -> Releasing.
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_FIRST_PUBLISH_TOKEN }}
         # The ./ matters: without it npm reads "npm-dist/x.tgz" as a GitHub
         # owner/repo shorthand and tries to fetch it over git (broke v0.2.0).
         run: npm publish ./npm-dist/rastrolog-*.tgz --provenance --access public --ignore-scripts

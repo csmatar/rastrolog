@@ -70,13 +70,6 @@ Pre-commit: `cd python && uv run pre-commit install` once; hooks run ruff, mypy,
 
 Configured (0.1.0 shipped with it): PyPI trusted publisher for owner `csmatar`, repo `rastrolog`, workflow `release.yml`, environment `pypi`; GitHub `pypi` environment with a required reviewer (`@csmatar`) and a `v*` tag rule.
 
-npm (first release, 0.2.0): trusted publishing can only be set up for an existing package. Before tagging v0.2.0:
-1. Create the GitHub `npm` environment (required reviewer `@csmatar`, `v*` tags only).
-2. Store a granular npm token that expires in 1 day as its secret `NPM_FIRST_PUBLISH_TOKEN`.
-
-After v0.2.0 is on npm:
-1. Add the trusted publisher on npmjs.com (repo `csmatar/rastrolog`, workflow `release.yml`, environment `npm`).
-2. Delete the token and the secret, and set the package to disallow token publishing.
-3. Open a PR that removes the `NODE_AUTH_TOKEN` env block from `release.yml`.
+Configured (npm since 0.2.1): npm trusted publisher for repo `csmatar/rastrolog`, workflow `release.yml`, environment `npm`, with token publishing disallowed; GitHub `npm` environment with a required reviewer (`@csmatar`) and a `v*` tag rule. The one-day token used for the first npm release has been deleted. No npm token exists or is needed.
 
 Never publish from a laptop. `uv publish`, `npm publish` and `pnpm publish` are denied in `.claude/settings.json`.
