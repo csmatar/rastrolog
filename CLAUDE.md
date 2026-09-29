@@ -66,6 +66,8 @@ Pre-commit: `cd python && uv run pre-commit install` once; hooks run ruff, mypy,
    - waits for a maintainer to approve each of the `pypi` and `npm` deployments;
    - publishes through trusted publishing, with provenance on npm.
 
+   If one registry publishes and the other fails, re-run only the failed publish job for the same tag; never bump the version to recover. For npm before trusted publishing is set up, that means minting a fresh one-day token first.
+
 Configured (0.1.0 shipped with it): PyPI trusted publisher for owner `csmatar`, repo `rastrolog`, workflow `release.yml`, environment `pypi`; GitHub `pypi` environment with a required reviewer (`@csmatar`) and a `v*` tag rule.
 
 npm (first release, 0.2.0): trusted publishing can only be set up for an existing package. Before tagging v0.2.0:
