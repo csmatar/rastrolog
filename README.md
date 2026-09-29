@@ -6,6 +6,8 @@
 
 **See which AI crawlers read your site and which AI chat products send you visitors.**
 
+![rastrolog parse and rastrolog check in a terminal](docs/demo.gif)
+
 `rastrolog` reads your access logs and prints two tables:
 
 1. **AI crawlers** by user agent (GPTBot, ClaudeBot, PerplexityBot, …): what they fetched, and whether each one is there to train, to fetch a page for a user, or to build a search index.
