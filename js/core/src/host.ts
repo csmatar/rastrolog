@@ -1,6 +1,11 @@
 /** Lowercase, drop trailing dots and one leading "www." (Python: `normalize_host`). */
 export function normalizeHost(host: string): string {
-  const h = host.trim().toLowerCase().replace(/\.+$/, "");
+  const lowered = host.trim().toLowerCase();
+  // A loop, not /\.+$/: that regex backtracks quadratically on a long run of
+  // dots that isn't at the end, and raw Referer headers can reach this.
+  let end = lowered.length;
+  while (end > 0 && lowered[end - 1] === ".") end--;
+  const h = lowered.slice(0, end);
   return h.startsWith("www.") ? h.slice(4) : h;
 }
 

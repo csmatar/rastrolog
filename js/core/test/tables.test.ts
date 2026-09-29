@@ -39,6 +39,17 @@ describe("normalizeHost", () => {
   });
 });
 
+describe("normalizeHost on hostile input", () => {
+  // A regex like /\.+$/ backtracks quadratically on a long run of dots that
+  // isn't at the end; the ESM classifier can receive raw Referer headers.
+  it("stays linear on a long run of dots", () => {
+    const hostile = `${".".repeat(50_000)}x`;
+    const started = performance.now();
+    expect(normalizeHost(hostile)).toBe(hostile);
+    expect(performance.now() - started).toBeLessThan(50);
+  });
+});
+
 describe("buildTables", () => {
   it("keeps only user_agent crawlers, longest token first, ties in file order", () => {
     const { crawlers } = buildTables(
