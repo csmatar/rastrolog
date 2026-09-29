@@ -279,4 +279,10 @@ export const en = {
     analytics:
       "No cookies. Cloudflare Web Analytics counts visits, and the rastrolog snippet runs here too.",
   },
+  notFound: {
+    title: "Page not found · rastrolog",
+    heading: "Nothing here",
+    body: "That address isn't a page on rastrolog.com. The robots.txt checker and the log analyzer are on the home page.",
+    home: "Go to the home page",
+  },
 };

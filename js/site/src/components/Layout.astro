@@ -8,9 +8,11 @@ interface Props {
   lang: "en" | "es";
   title: string;
   description: string;
+  /** A page search engines shouldn't index, with no canonical URL of its own (the 404). */
+  noindex?: boolean;
 }
 
-const { lang, title, description } = Astro.props;
+const { lang, title, description, noindex = false } = Astro.props;
 const enUrl = new URL("/", siteConfig.siteUrl).href;
 const esUrl = new URL("/es/", siteConfig.siteUrl).href;
 const canonical = lang === "es" ? esUrl : enUrl;
@@ -23,16 +25,18 @@ const ogLocale = lang === "es" ? "es_MX" : "en_US";
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-    <link rel="alternate" hreflang="en" href={enUrl} />
-    <link rel="alternate" hreflang="es" href={esUrl} />
-    <link rel="alternate" hreflang="x-default" href={enUrl} />
+    {noindex ? <meta name="robots" content="noindex" /> : <>
+      <link rel="canonical" href={canonical} />
+      <link rel="alternate" hreflang="en" href={enUrl} />
+      <link rel="alternate" hreflang="es" href={esUrl} />
+      <link rel="alternate" hreflang="x-default" href={enUrl} />
+    </>}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="theme-color" content="#f7f6fb" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {!noindex && <meta property="og:url" content={canonical} />}
     <meta property="og:locale" content={ogLocale} />
     <Font cssVariable="--font-jetbrains-mono" preload />
     <Font cssVariable="--font-plex-sans" preload />

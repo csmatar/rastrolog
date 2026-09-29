@@ -1,0 +1,26 @@
+---
+import { en } from "../i18n/en.ts";
+import { es } from "../i18n/es.ts";
+import Footer from "./Footer.astro";
+import Layout from "./Layout.astro";
+
+// One 404 for both languages: Pages serves /404.html for every unknown address,
+// /es/ ones included.
+const blocks = [
+  { lang: "en", home: "/", t: en.notFound },
+  { lang: "es", home: "/es/", t: es.notFound },
+] as const;
+---
+<Layout lang="en" title={en.notFound.title} description={en.notFound.body} noindex>
+  <main class="hero-bg flex min-h-[70vh] flex-col justify-center gap-12 px-5 py-16 md:px-[120px]">
+    <p class="m-0 font-mono text-sm text-muted"><span class="text-brand" aria-hidden="true">›_</span> rastrolog · 404</p>
+    {blocks.map(({ lang, home, t }, i) => (
+      <section lang={lang} class="flex flex-col items-start gap-4">
+        {i === 0 ? <h1 class="m-0 text-4xl font-bold md:text-5xl">{t.heading}</h1> : <h2 class="m-0 text-3xl font-bold md:text-4xl">{t.heading}</h2>}
+        <p class="m-0 max-w-[60ch] text-lg">{t.body}</p>
+        <a href={home} class="inline-flex h-12 items-center rounded-input bg-brand px-6 font-mono font-extrabold text-white no-underline hover:bg-accent hover:text-white">{t.home}</a>
+      </section>
+    ))}
+  </main>
+  <Footer lang="en" />
+</Layout>

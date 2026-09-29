@@ -77,7 +77,7 @@ Production only: `SITE_URL=https://rastrolog.com`, `KIT_FORM_GENERAL`, `KIT_FORM
 ### Launch checklist (once)
 
 1. **Kit.** Do the "Kit setup" above: two forms, the `checked_domain` field, and the report link in both confirmation emails. Note both form IDs. The production build fails without them. In each form's settings, leave **After subscribing** on Kit's own success message, with no redirect URL: the CSP's `form-action` allows only `app.kit.com`, and Chrome also checks the redirect that follows a form post, so a redirect back to this site would be blocked for visitors without JavaScript.
-2. **Cloudflare zone.** In Cloudflare, add the site `rastrolog.com` on the Free plan. If it asks how to treat AI crawlers, choose the option that allows all crawlers. Leave managed robots.txt and Bot Fight Mode off: crawlers must see this site's own `robots.txt`, which the checker also reports on, and Bot Fight Mode injects an inline script the CSP blocks. Before switching nameservers, make the zone's DNS match these records exactly:
+2. **Cloudflare zone.** In Cloudflare, add the site `rastrolog.com` on the Free plan. If it asks how to treat AI crawlers, choose the option that allows all crawlers. Leave managed robots.txt and Bot Fight Mode off, and turn off Bot Preference Sync (it prepends Cloudflare's lines to `robots.txt`): crawlers must see this site's own `robots.txt`, which the checker also reports on, and Bot Fight Mode injects an inline script the CSP blocks. Before switching nameservers, make the zone's DNS match these records exactly:
 
    | Type | Name | Content | Proxy |
    | --- | --- | --- | --- |
@@ -88,9 +88,9 @@ Production only: `SITE_URL=https://rastrolog.com`, `KIT_FORM_GENERAL`, `KIT_FORM
 
    Delete anything else Cloudflare imported from Porkbun: the apex `ALIAS`/`A`, the `*` CNAME, and the two `_acme-challenge` TXT records.
 3. **Nameservers.** In Porkbun (Domain Management, then Authoritative Nameservers), replace Porkbun's nameservers with the two Cloudflare shows. Wait for Cloudflare to report the zone active.
-4. **Pages project.** In Workers & Pages, choose Create, then Pages, then Connect to Git. When GitHub asks, grant the Cloudflare app access to `csmatar/rastrolog` only. Name the project `rastrolog`, then enter the settings and variables above.
+4. **Pages project.** In Workers & Pages, choose Create application, then the **Continue to Pages** link under the options (the buttons above it create a Worker). Import an existing Git repository; when GitHub asks, grant the Cloudflare app access to `csmatar/rastrolog` only. If Cloudflare keeps showing Connect GitHub after the app is installed, uninstall the app on GitHub and connect again from Cloudflare. Name the project `rastrolog` and enter the settings above with only the three variables for both environments. After the first build, add the four production-only variables under Settings with the environment selector on Production, confirm Preview has none of them, and retry the production deployment.
 5. **Custom domain.** In the project, go to Custom domains and add `rastrolog.com`.
-6. **www redirect.** Under Rules, create a Bulk Redirect list with one entry: `www.rastrolog.com` to `https://rastrolog.com`, status 301, with preserve query string, subpath matching, preserve path suffix and include subdomains all on. Enable a Bulk Redirect rule that uses the list.
+6. **www redirect.** In the zone, under Rules, create a rule from the **Redirect from WWW to root** template: wildcard request URL `*://www.rastrolog.com/*`, target `https://rastrolog.com/${2}`, status 301, preserve query string on.
 7. **Web Analytics.** In the project's Metrics, enable Web Analytics.
 8. **Check.** From `js/`, run `pnpm --filter @rastrolog/site run verify-live`. Every line should read `ok`.
 9. **No-JavaScript signup.** In Chrome with JavaScript disabled, open https://rastrolog.com, submit the email band, and confirm Kit's success page loads and the console shows no Content Security Policy error.
