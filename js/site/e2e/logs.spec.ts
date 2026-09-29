@@ -73,16 +73,16 @@ test("gzip, a concatenated multi-member gzip, and a truncated gzip", async ({ pa
   const input = page.locator("[data-log-file]");
   await input.setInputFiles(file("access.log.gz", gzipSync(NGINX)));
   await expect(field(page, "headline")).toHaveText(HEADLINE);
-  // Chromium's DecompressionStream rejects data after the first gzip member, so a
-  // concatenated gzip reads its first member and says the file ends early
-  // (conformance/README.md, "Known gaps"). Python reads every member.
   await input.setInputFiles(
     file("access.log.1.gz", Buffer.concat([gzipSync(NGINX), gzipSync(NGINX)])),
   );
-  await expect(field(page, "meta")).toContainText(
-    "access.log.1.gz · nginx/Apache combined · 15 lines · 1 skipped",
+  await expect(field(page, "headline")).toHaveText(
+    "14 AI crawler visits. 8 people sent by AI chats.",
   );
-  await expect(field(page, "truncated")).toBeVisible();
+  await expect(field(page, "meta")).toContainText(
+    "access.log.1.gz · nginx/Apache combined · 30 lines · 2 skipped",
+  );
+  await expect(field(page, "truncated")).toBeHidden();
   const gz = gzipSync(NGINX);
   await input.setInputFiles(file("cut.log.gz", gz.subarray(0, gz.length - 12)));
   await expect(field(page, "truncated")).toBeVisible();
