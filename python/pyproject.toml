@@ -1,6 +1,6 @@
 [project]
 name = "rastrolog"
-version = "0.1.0"
+version = "0.1.1"
 description = "See which AI crawlers read your site and which AI chat products send you visitors."
 readme = "README.md"
 license = "MIT"
