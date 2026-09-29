@@ -131,4 +131,6 @@ jobs:
           # `npm` environment) is used once. Remove this env block after the trusted
           # publisher is configured; see CLAUDE.md -> Releasing.
           NODE_AUTH_TOKEN: ${{ secrets.NPM_FIRST_PUBLISH_TOKEN }}
-        run: npm publish npm-dist/rastrolog-*.tgz --provenance --access public --ignore-scripts
+        # The ./ matters: without it npm reads "npm-dist/x.tgz" as a GitHub
+        # owner/repo shorthand and tries to fetch it over git (broke v0.2.0).
+        run: npm publish ./npm-dist/rastrolog-*.tgz --provenance --access public --ignore-scripts

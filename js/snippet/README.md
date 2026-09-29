@@ -12,7 +12,7 @@ One script tag, under 2 KB gzipped. It reads `document.referrer`, and when a vis
 
 <!-- rastrolog:sri:start -->
 ```html
-<script src="https://cdn.jsdelivr.net/npm/rastrolog@0.2.0/dist/snippet.min.js" integrity="sha384-f1WmE4FFMG3T7OCN/djpfKWMNHW3DxGQ3dICa4ZZlIlqLgLnzr4Yzfs0SFK0Wzdm" crossorigin="anonymous" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/rastrolog@0.2.1/dist/snippet.min.js" integrity="sha384-f1WmE4FFMG3T7OCN/djpfKWMNHW3DxGQ3dICa4ZZlIlqLgLnzr4Yzfs0SFK0Wzdm" crossorigin="anonymous" defer></script>
 ```
 <!-- rastrolog:sri:end -->
 
