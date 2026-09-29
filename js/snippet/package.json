@@ -1,0 +1,53 @@
+{
+  "name": "rastrolog",
+  "version": "0.1.1",
+  "description": "Spot visitors from ChatGPT, Claude, Perplexity and other AI chat products, and send them to the analytics you already run. One script tag, under 2 KB.",
+  "keywords": [
+    "ai",
+    "analytics",
+    "referrer",
+    "chatgpt",
+    "perplexity",
+    "claude",
+    "ga4",
+    "plausible",
+    "posthog"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/csmatar/rastrolog#readme",
+  "bugs": "https://github.com/csmatar/rastrolog/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/csmatar/rastrolog.git",
+    "directory": "js/snippet"
+  },
+  "type": "module",
+  "sideEffects": [
+    "./dist/snippet.min.js"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./snippet": "./dist/snippet.min.js",
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "codegen": "node ../core/scripts/codegen.ts",
+    "typecheck": "pnpm run codegen && tsc -p tsconfig.json",
+    "test": "pnpm run codegen && vitest run"
+  },
+  "devDependencies": {
+    "@rastrolog/core": "workspace:*",
+    "happy-dom": "^20.14.3"
+  }
+}
