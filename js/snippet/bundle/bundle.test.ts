@@ -49,7 +49,10 @@ describe("dist/snippet.min.js", () => {
 
 describe("dist/index.js", () => {
   it("exports the classifiers and works", async () => {
-    const mod = (await import("../dist/index.js")) as typeof import("../src/index.js");
+    // A runtime URL, not a literal specifier: typecheck runs before the build in
+    // CI, so dist/ may not exist yet. The shape is typed from the source entry.
+    const entry = new URL("../dist/index.js", import.meta.url).href;
+    const mod = (await import(entry)) as typeof import("../src/index.js");
     expect(mod.classifyReferrer("https://chatgpt.com/")?.id).toBe("chatgpt");
     expect(mod.classifyUserAgent("GPTBot/1.4")?.id).toBe("openai-gptbot");
   });
