@@ -32,6 +32,22 @@ rastrolog check "https://chatgpt.com/"         # classify one referrer or user a
 
 `--json` writes the same report as JSON on stdout, for piping into anything else.
 
+## In the browser
+
+A script tag that sends an `ai_referral` event to the analytics you already run (GA4, Plausible, PostHog, Fathom, Umami, Matomo or Google Tag Manager). It's under 2 KB and makes no requests of its own:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/rastrolog@0/dist/snippet.min.js" defer></script>
+```
+
+Pinned, with Subresource Integrity:
+
+<!-- rastrolog:sri:start -->
+The pinned tag with its `integrity` hash is written here when the first npm release (0.2.0) is published.
+<!-- rastrolog:sri:end -->
+
+See [`js/snippet/README.md`](js/snippet/README.md) for what each analytics tool receives, `window.aiTraffic`, and the `rastrolog:match` event.
+
 ## In your app
 
 FastAPI / Starlette:
