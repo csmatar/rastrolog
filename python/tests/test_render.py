@@ -2,8 +2,16 @@ from datetime import datetime, timezone
 
 from helpers import report_for
 from rich.console import Console
+from rich.table import Table
 
-from rastrolog.render import render_report, summary_line
+from rastrolog.render import (
+    crawler_table,
+    page_table,
+    referral_table,
+    render_report,
+    search_engine_table,
+    summary_line,
+)
 from rastrolog.report import CrawlerRow, PageRow, Report
 from rastrolog.theme import THEME, purpose_badge
 
@@ -92,3 +100,51 @@ def test_page_view_paths_with_markup_looking_paths_render_verbatim() -> None:
     report = Report(records=1, skipped=0, crawlers=(), referrals=(), pages=(page,))
     text = _render(report, by="page")
     assert "/_next/static/chunks/pages/blog/[slug]-8f2c.js" in text
+
+
+def _lines(table: Table | None, width: int = 200) -> list[str]:
+    assert table is not None
+    console = Console(record=True, width=width, theme=THEME, color_system=None)
+    console.print(table)
+    return console.export_text().splitlines()
+
+
+def _row_separators(lines: list[str]) -> int:
+    """Separator lines inside the table body (the header separator counts too)."""
+    return sum(1 for line in lines if line.lstrip().startswith("├"))
+
+
+def test_page_view_never_splits_a_name_from_its_count() -> None:
+    crawlers = (
+        ("ClaudeBot", 77),
+        ("GPTBot", 76),
+        ("Bytespider", 24),
+        ("PerplexityBot", 21),
+        ("ChatGPT-User", 19),
+        ("meta-externalagent", 18),
+    )
+    referrals = (("ChatGPT", 33), ("Claude", 11))
+    page = PageRow(
+        path="/docs/getting-started",
+        crawler_requests=235,
+        referral_visits=44,
+        crawlers=crawlers,
+        referrals=referrals,
+    )
+    report = Report(records=279, skipped=0, crawlers=(), referrals=(), pages=(page,))
+    lines = _lines(page_table(report), width=100)
+    for name, count in crawlers + referrals:
+        assert any(f"{name} {count}" in line for line in lines), f"{name} {count} was split"
+
+
+def test_multi_line_tables_separate_their_rows() -> None:
+    report = report_for("nginx")
+    ai_crawlers = [r for r in report.crawlers if r.ai_specific]
+    # header separator + one separator between each pair of rows
+    assert _row_separators(_lines(crawler_table(report))) == len(ai_crawlers)
+    assert _row_separators(_lines(referral_table(report))) == len(report.referrals)
+    assert _row_separators(_lines(page_table(report))) == len(report.pages)
+
+
+def test_search_engine_table_stays_compact() -> None:
+    assert _row_separators(_lines(search_engine_table(report_for("nginx")))) == 1

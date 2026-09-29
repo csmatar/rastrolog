@@ -35,13 +35,20 @@ def _pages(pages: Sequence[tuple[str, int]]) -> Text:
     return cell
 
 
-def _pairs(pairs: Sequence[tuple[str, int]]) -> str:
-    return ", ".join(f"{name} {count}" for name, count in pairs) or "–"
+def _pairs(pairs: Sequence[tuple[str, int]]) -> Text:
+    """One ``name count`` pair per line, like ``_pages``: a wrapped comma list can
+    break between a name and its count, and rich wraps on non-breaking spaces too."""
+    if not pairs:
+        return Text("–")
+    return Text("\n".join(f"{name} {count}" for name, count in pairs))
 
 
-def _table(title: str, *, muted: bool = False) -> Table:
+def _table(title: str, *, muted: bool = False, separate_rows: bool = False) -> Table:
+    """``separate_rows`` draws a line between rows; use it for tables whose cells span
+    several lines (top pages, crawler/referral pairs) so each row reads as one unit."""
     return Table(
         title=title,
+        show_lines=separate_rows,
         title_style="muted" if muted else "brand",
         title_justify="left",
         box=box.ROUNDED,
@@ -55,7 +62,7 @@ def crawler_table(report: Report) -> Table | None:
     rows = [r for r in report.crawlers if r.ai_specific]
     if not rows:
         return None
-    table = _table("AI crawlers")
+    table = _table("AI crawlers", separate_rows=True)
     table.add_column("Vendor")
     table.add_column("Token", style="bold")
     table.add_column("Purpose")
@@ -96,7 +103,7 @@ def search_engine_table(report: Report) -> Table | None:
 def referral_table(report: Report) -> Table | None:
     if not report.referrals:
         return None
-    table = _table("AI referrals")
+    table = _table("AI referrals", separate_rows=True)
     table.add_column("Product", style="bold")
     table.add_column("Vendor")
     table.add_column("Visits", justify="right", style="count")
@@ -118,7 +125,7 @@ def referral_table(report: Report) -> Table | None:
 def page_table(report: Report) -> Table | None:
     if not report.pages:
         return None
-    table = _table("Pages AI tools touch")
+    table = _table("Pages AI tools touch", separate_rows=True)
     table.add_column("Page", style="bold")
     table.add_column("Crawler requests", justify="right", style="count")
     table.add_column("Referral visits", justify="right", style="count")

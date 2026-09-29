@@ -7,6 +7,10 @@ under **Signals** so they're easy to scan when updating robots.txt.
 
 ## [Unreleased]
 
+### Changed
+
+- CLI: `--by page` lists one crawler/referral per line so a name is never split from its count, and the crawler, referral and page tables draw a line between rows so multi-line cells read as one row.
+
 ### Fixed
 
 - CLI: report "is a directory" when a directory path is passed to `rastrolog parse` instead of "file not found".
