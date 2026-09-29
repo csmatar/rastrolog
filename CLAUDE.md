@@ -50,6 +50,7 @@ pnpm --filter @rastrolog/site run dev            # http://localhost:4321
 pnpm --filter @rastrolog/site run build          # js/site/dist
 pnpm --filter @rastrolog/site run e2e            # Playwright + axe against astro preview (after a build)
 pnpm --filter @rastrolog/site run lhci           # Lighthouse budgets (after a build)
+```
 
 `js/core/src/*.gen.ts` are generated from `signals.json` by `js/core/scripts/codegen.ts` and gitignored.
 
