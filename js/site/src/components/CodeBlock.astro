@@ -8,9 +8,9 @@ interface Props {
 
 const { lines, prompt = false, copy, copied } = Astro.props;
 ---
-<div class="flex flex-col gap-2.5 rounded-input border border-line bg-surface px-4 py-3.5 font-mono text-[13px] leading-[1.8] md:flex-row md:items-start md:justify-between md:gap-3 md:rounded-xl md:px-[18px] md:py-4 md:text-[15px]">
+<div class="flex flex-col gap-2.5 rounded-input border border-ink bg-ink px-4 text-term-text py-3.5 font-mono text-[13px] leading-[1.8] md:flex-row md:items-start md:justify-between md:gap-3 md:rounded-xl md:px-[18px] md:py-4 md:text-[15px]">
   <code class="min-w-0 break-all">
-    {lines.map((line) => <span class="block">{prompt && <span class="text-brand" aria-hidden="true">{"$ "}</span>}{line}</span>)}
+    {lines.map((line) => <span class="block">{prompt && <span class="text-term-prompt" aria-hidden="true">{"$ "}</span>}{line}</span>)}
   </code>
-  <button type="button" data-copy={lines.join("\n")} data-copied-label={copied} aria-live="polite" class="h-11 shrink-0 self-start rounded-btn border border-line bg-transparent px-3.5 font-mono text-[13px] font-bold text-ink data-[copied]:border-ok data-[copied]:text-ok">{copy}</button>
+  <button type="button" data-copy={lines.join("\n")} data-copied-label={copied} aria-live="polite" class="h-11 shrink-0 self-start rounded-btn border border-term-line bg-transparent px-3.5 font-mono text-[13px] font-bold text-term-text hover:border-term-text focus-visible:outline-term-focus data-[copied]:border-term-ok data-[copied]:text-term-ok">{copy}</button>
 </div>

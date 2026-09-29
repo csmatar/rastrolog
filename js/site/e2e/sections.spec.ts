@@ -14,6 +14,9 @@ test("install commands copy, with a visible Copied state", async ({ page }) => {
   await expect(button).toHaveText("Copy", { timeout: 4000 });
   await expect(page.locator("#install code").last()).toContainText('integrity="sha384-');
   await expect(page.locator("#install a")).toHaveCount(0);
+  const block = page.locator("#install button").first().locator("xpath=..");
+  await expect(block).toHaveCSS("background-color", "rgb(23, 21, 30)");
+  await expect(block.locator("code")).toHaveCSS("color", "rgb(236, 234, 243)");
 });
 
 test("what it detects: every crawler token links to its documentation", async ({ page }) => {

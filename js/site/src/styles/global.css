@@ -34,6 +34,12 @@
   --color-fetch-ink: #03140d;
   --color-search: #6a45e0;
   --color-search-ink: #ffffff;
+  /* The install section's terminal blocks: the only dark surface on the page. */
+  --color-term-text: #eceaf3;
+  --color-term-line: #4a4458;
+  --color-term-prompt: #f25d94;
+  --color-term-ok: #3ddc97;
+  --color-term-focus: #a58bff;
 
   --font-*: initial;
   --font-mono: var(--font-jetbrains-mono);
