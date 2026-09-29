@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import type { Page, Route } from "@playwright/test";
 
 export const SIGNALS = JSON.parse(
@@ -57,3 +58,7 @@ export async function serveSite(
   await page.route(`https://${host}/robots.txt`, answer(files.robots));
   await page.route(`https://${host}/llms.txt`, answer(files.llms));
 }
+
+export const NGINX_LOG = fileURLToPath(
+  new URL("../../../conformance/logs/nginx.log", import.meta.url),
+);

@@ -259,7 +259,9 @@ port in `js/core/src/logs/` mirrors them.
   every complete line decoded before the damage; the TypeScript port can lose
   the last few kilobytes of decoded text on runtimes whose `DecompressionStream`
   discards buffered output when it fails (Node's does). Both mark the result
-  truncated.
+  truncated. In browsers, Chromium's `DecompressionStream` rejects a second gzip member
+  (`cat a.gz b.gz`), so the page reads the first member and marks the result
+  truncated; Python and Node read every member.
 
 ### Golden generation parameters
 
