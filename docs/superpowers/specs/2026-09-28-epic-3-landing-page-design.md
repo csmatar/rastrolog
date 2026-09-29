@@ -201,7 +201,7 @@ The Playwright suite runs every test with this exact CSP added to each response 
 2. The zone recreates Porkbun's email records before the switch: MX `fwd1.porkbun.com` (priority 10) and `fwd2.porkbun.com` (priority 20), and TXT `v=spf1 include:_spf.porkbun.com ~all`.
 3. It drops the parking-page records: the `ALIAS` for the apex, the `*` CNAME, and the two `_acme-challenge` TXT records.
 4. `rastrolog.com` is the Pages custom domain.
-5. `www` is a proxied `A` record to `192.0.2.1`, with a Bulk Redirect (301, keeping path and query) to `https://rastrolog.com`.
+5. `www` is a proxied `A` record to `192.0.2.1`, with a single Redirect Rule (301, keeping path and query) to `https://rastrolog.com`.
 
 **After the switch**, checked from outside:
 
