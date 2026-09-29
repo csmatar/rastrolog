@@ -7,14 +7,16 @@ under **Signals** so they're easy to scan when updating robots.txt.
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-29
+
 ### Changed
 
-- CLI: `--by page` lists one crawler/referral per line so a name is never split from its count, and the crawler, referral and page tables draw a line between rows so multi-line cells read as one row.
+- CLI: `--by page` lists one crawler/referral per line so a name is never split from its count, and the crawler, referral and page tables draw a line between rows so multi-line cells read as one row (#21).
 
 ### Fixed
 
-- CLI: report "is a directory" when a directory path is passed to `rastrolog parse` instead of "file not found".
-- CLI: add referrer URL hint when a bare host without scheme is passed to `rastrolog check`.
+- CLI: report "is a directory" when a directory path is passed to `rastrolog parse` instead of "file not found" (#18, thanks @HeaTTap).
+- CLI: add referrer URL hint when a bare host without scheme is passed to `rastrolog check` (#18, thanks @HeaTTap).
 
 ## [0.1.0] - 2026-09-29
 
