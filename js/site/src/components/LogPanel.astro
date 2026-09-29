@@ -1,0 +1,37 @@
+---
+import { type Lang, strings } from "../i18n/index.ts";
+
+interface Props {
+  lang: Lang;
+  class?: string;
+}
+
+const { lang, class: className } = Astro.props;
+const t = strings(lang).logPanel;
+---
+<div id="log-panel" data-log-drop class:list={[className, "overflow-hidden rounded-panel border border-line bg-surface shadow-panel data-[dragging]:border-accent data-[dragging]:ring-2 data-[dragging]:ring-accent"]}>
+  <div class="flex items-center justify-between gap-3 border-b border-line bg-surface-2 px-4 py-2.5 font-mono text-xs text-muted md:px-[18px] md:py-3 md:text-[13px]">
+    <span><span class="font-bold text-brand" aria-hidden="true">$</span> {t.title}</span>
+    <span>{t.formats}</span>
+  </div>
+  <div class="flex flex-col gap-3 p-4 md:gap-3.5 md:px-6 md:pt-5 md:pb-6">
+    <div class="flex flex-col items-center justify-center gap-2.5 rounded-panel border-2 border-dashed border-dash bg-drop p-4 text-center md:p-[22px]">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="text-accent"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" /></svg>
+      <p class="m-0 hidden font-semibold md:block">{t.drop}</p>
+      <input id="logfile" data-log-file type="file" class="peer sr-only" />
+      <label for="logfile" class="inline-flex h-11 cursor-pointer items-center rounded-btn border border-accent px-4 font-mono text-sm font-bold text-accent peer-focus-visible:outline-3 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent">{t.choose}</label>
+    </div>
+    <details>
+      <summary class="inline-flex min-h-11 cursor-pointer items-center text-sm text-accent underline underline-offset-2">{t.pasteToggle}</summary>
+      <div class="mt-2 flex flex-col gap-2">
+        <label for="log-paste" class="text-sm font-semibold">{t.pasteLabel}</label>
+        <textarea id="log-paste" data-log-paste rows="5" spellcheck="false" class="w-full rounded-btn border border-line bg-code p-3 font-mono text-[13px] text-ink"></textarea>
+        <button type="button" data-log-paste-run class="h-11 self-start rounded-btn border border-accent px-4 font-mono text-sm font-bold text-accent">{t.pasteButton}</button>
+      </div>
+    </details>
+    <p class="m-0 flex items-center gap-2 text-sm font-semibold text-ok">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="shrink-0"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+      {t.promise}
+    </p>
+  </div>
+</div>

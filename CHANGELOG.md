@@ -9,6 +9,10 @@ under **Signals** so they're easy to scan when updating robots.txt.
 
 ### Added
 
+- Landing page (`js/site`), in English and Spanish:
+  - a robots.txt checker covering every crawler in `signals.json`;
+  - a log analyzer that reads nginx, Apache, CloudFront and ALB logs, plain or gzipped, in the browser;
+  - an email ask after each result (#3).
 - Conformance: `conformance/log_lines.json` pins line-level log parsing (CLF offsets and invalid dates, escapes, CloudFront headers, absolute request targets, percent-decoding) so the TypeScript log parser is held to the same behaviour as Python.
 
 ## [0.2.1] - 2026-09-29

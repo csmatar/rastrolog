@@ -1,0 +1,79 @@
+---
+import { type Lang, strings } from "../i18n/index.ts";
+import EmailAsk from "./EmailAsk.astro";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const c = strings(lang).checker;
+const grid = "md:grid md:grid-cols-[140px_220px_160px_minmax(0,1fr)] md:items-center md:gap-4";
+const button =
+  "h-11 self-start rounded-btn bg-brand px-[22px] font-mono text-sm font-extrabold text-white hover:bg-accent md:h-12 md:text-[15px]";
+const area = "w-full rounded-btn border border-line bg-code p-3.5 font-mono text-sm text-ink";
+---
+<section id="checker" hidden aria-labelledby="checker-h2" class="flex flex-col gap-3.5 px-5 pt-12 md:gap-[22px] md:px-[120px] md:pt-[88px]">
+  <h2 id="checker-h2" class="m-0 font-mono text-2xl leading-tight font-extrabold tracking-[-0.02em] md:text-[34px]">{c.h2}</h2>
+  <p data-checker-status role="status" class="m-0 font-mono text-sm text-muted empty:hidden"></p>
+
+  <div data-checker-paste hidden class="flex flex-col gap-3.5 rounded-panel border border-warn bg-surface p-4 md:px-[26px] md:py-6">
+    <p data-f="message" class="m-0 font-semibold"></p>
+    <a data-f="open" href="#checker" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center self-start font-mono text-sm break-all"></a>
+    <label for="paste-robots" class="text-[15px] font-semibold">{c.pasteLabel}</label>
+    <textarea id="paste-robots" data-f="text" rows="6" spellcheck="false" class={area}></textarea>
+    <button type="button" data-f="run" class={button}>{c.pasteButton}</button>
+  </div>
+
+  <div data-checker-result hidden class="flex flex-col gap-3.5 md:gap-[22px]">
+    <ul class="m-0 flex list-none flex-col gap-1 p-0 font-mono text-[13px] text-muted md:flex-row md:flex-wrap md:items-center md:gap-x-7 md:text-sm">
+      <li class="flex gap-2"><span data-f="robots-mark" aria-hidden="true" class="font-bold data-[mark=ok]:text-ok data-[mark=warn]:text-warn"></span><span data-f="robots"></span></li>
+      <li class="flex gap-2"><span data-f="llms-mark" aria-hidden="true" class="font-bold data-[mark=ok]:text-ok data-[mark=warn]:text-warn"></span><span data-f="llms"></span></li>
+      <li>{c.checkedAt} · <a href="#top">{c.again}</a><span data-f="llms-paste-item" hidden> · <button type="button" data-f="llms-paste-toggle" aria-expanded="false" aria-controls="llms-paste-panel" class="inline-flex min-h-11 cursor-pointer items-center border-0 bg-transparent p-0 font-mono text-[13px] text-accent md:text-sm underline underline-offset-2 hover:text-accent-hover">{c.llms.pasteSummary}</button></span></li>
+    </ul>
+    <div id="llms-paste-panel" data-f="llms-paste" hidden class="flex flex-col gap-2 text-sm">
+      <label for="paste-llms" class="font-semibold">{c.llms.pasteLabel}</label>
+      <textarea id="paste-llms" data-f="llms-text" rows="4" spellcheck="false" class={area}></textarea>
+      <button type="button" data-f="llms-run" class={button}>{c.llms.pasteButton}</button>
+    </div>
+    <div class="flex flex-col gap-1.5">
+      <p data-f="headline" class="m-0 font-mono text-[25px] leading-[1.2] font-extrabold tracking-[-0.03em] md:text-[40px] md:leading-[1.15]"></p>
+      <p data-f="sub" class="m-0 text-base text-muted md:text-lg"></p>
+    </div>
+    <ul data-f="summary" class="m-0 flex list-none flex-col gap-2 rounded-panel border border-line bg-surface p-4 font-mono text-sm leading-[1.7] md:px-6 md:py-5 md:text-base md:leading-[1.85]"></ul>
+    <EmailAsk lang={lang} variant="checker" />
+    <div data-f="groups" class="flex flex-col gap-3.5 md:gap-[18px]"></div>
+  </div>
+
+  <template data-tpl="summary-line">
+    <li class="group flex gap-2.5"><span data-f="glyph" aria-hidden="true" class="shrink-0 font-bold group-data-[verdict=allowed]:text-ok group-data-[verdict=blocked]:text-err group-data-[verdict=partial]:text-warn"></span><span data-f="text"></span></li>
+  </template>
+
+  <template data-tpl="group">
+    <details open class="overflow-hidden rounded-panel border border-line bg-surface">
+      <summary class="flex min-h-11 cursor-pointer flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-line bg-surface-2 px-4 py-3 md:px-5">
+        <span data-f="badge" class="rounded-full px-2.5 py-0.5 font-mono text-[13px] font-bold data-[purpose=search-index]:bg-search data-[purpose=search-index]:text-search-ink data-[purpose=training]:bg-training data-[purpose=training]:text-training-ink data-[purpose=user-fetch]:bg-fetch data-[purpose=user-fetch]:text-fetch-ink"></span>
+        <span data-f="counts" class="text-sm text-muted"></span>
+      </summary>
+      <div role="table" data-f="table" class="text-sm">
+        <div role="row" class:list={["hidden px-5 py-2 font-mono text-xs tracking-[0.06em] text-muted uppercase", grid]}>
+          <span role="columnheader">{c.columns.verdict}</span><span role="columnheader">{c.columns.token}</span><span role="columnheader">{c.columns.vendor}</span><span role="columnheader">{c.columns.lines}</span>
+        </div>
+        <div data-f="rows" role="rowgroup"></div>
+      </div>
+    </details>
+  </template>
+
+  <template data-tpl="row">
+    <div role="row" class:list={["group flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-t border-line-soft px-4 py-2.5 md:px-5 md:py-[7px]", grid]}>
+      <span role="cell" class="flex items-center gap-2 font-mono font-bold group-data-[verdict=allowed]:text-ok group-data-[verdict=blocked]:text-err group-data-[verdict=partial]:text-warn"><span data-f="glyph" aria-hidden="true"></span><span data-f="verdict"></span></span>
+      <span role="cell" data-f="token" class="font-mono font-medium"></span>
+      <span role="cell" data-f="vendor" class="text-muted"></span>
+      <span role="cell" data-f="evidence" class="w-full font-mono text-[13px] break-all text-muted md:w-auto"></span>
+    </div>
+  </template>
+</section>
+
+<script>
+  import "../scripts/checker.ts";
+</script>

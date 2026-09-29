@@ -1,0 +1,25 @@
+---
+import { fmt } from "../i18n/format.ts";
+import { type Lang, strings } from "../i18n/index.ts";
+import { chatCount, crawlerCount } from "../lib/signals.ts";
+import CheckerPanel from "./CheckerPanel.astro";
+import LogPanel from "./LogPanel.astro";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = strings(lang).hero;
+---
+<section id="top" aria-labelledby="hero-title" class="flex flex-col gap-4 px-5 pt-5 pb-9 md:gap-6 md:px-[120px] md:pt-[60px] md:pb-14">
+  <p class="m-0 font-mono text-[13px] text-muted md:text-[15px]"><span class="font-bold text-brand" aria-hidden="true">$</span> {t.kicker}</p>
+  <h1 id="hero-title" class="m-0 font-mono text-[33px] leading-[1.12] font-extrabold tracking-[-0.035em] md:text-[62px] md:leading-[1.08]">
+    <span class="block">{t.h1a}</span>{" "}<span class="mt-1.5 block text-brand md:mt-0">{t.h1b}<span class="rl-cursor" aria-hidden="true"></span></span>
+  </h1>
+  <p class="m-0 max-w-[860px] text-[17px] text-muted md:text-xl">{fmt(t.lead, { crawlers: crawlerCount, others: chatCount - 2 })}</p>
+  <div class="mt-1.5 grid gap-4 md:mt-3 md:grid-cols-12 md:items-start md:gap-6">
+    <CheckerPanel lang={lang} class="md:col-span-7" />
+    <LogPanel lang={lang} class="md:col-span-5" />
+  </div>
+</section>

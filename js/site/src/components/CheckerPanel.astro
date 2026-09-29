@@ -1,0 +1,30 @@
+---
+import { type Lang, strings } from "../i18n/index.ts";
+
+interface Props {
+  lang: Lang;
+  class?: string;
+}
+
+const { lang, class: className } = Astro.props;
+const t = strings(lang).checkerPanel;
+---
+<form id="checker-form" data-checker-form novalidate class:list={[className, "m-0 overflow-hidden rounded-panel border border-line bg-surface shadow-panel"]}>
+  <div class="flex items-center justify-between gap-3 border-b border-line bg-surface-2 px-4 py-2.5 font-mono text-xs text-muted md:px-[18px] md:py-3 md:text-[13px]">
+    <span><span class="font-bold text-brand" aria-hidden="true">$</span> {t.title}</span>
+    <span>{t.files}</span>
+  </div>
+  <div class="flex flex-col gap-2.5 p-4 md:gap-3 md:p-6">
+    <label for="domain" class="text-[15px] font-semibold">{t.label}</label>
+    <div class="flex flex-col gap-2.5 md:flex-row">
+      <div class="rl-field flex grow items-center rounded-input border-2 border-brand bg-surface font-mono text-[17px] md:text-[19px]">
+        <span class="pr-0.5 pl-3 text-muted md:pr-1 md:pl-4" aria-hidden="true">https://</span>
+        <input id="domain" name="domain" type="text" inputmode="url" autocomplete="url" autocapitalize="none" spellcheck="false" placeholder="example.com" aria-describedby="domain-help domain-error" class="h-[52px] min-w-0 grow border-0 bg-transparent font-mono text-ink outline-none md:h-14" />
+      </div>
+      <button type="submit" class="h-14 shrink-0 rounded-input bg-brand px-7 font-mono text-[17px] font-extrabold text-white hover:bg-accent md:h-[60px] md:text-lg">{t.button}</button>
+    </div>
+    <p id="domain-error" data-domain-error hidden class="m-0 text-sm font-semibold text-err"></p>
+    <p id="domain-help" class="m-0 text-sm text-muted">{t.help}</p>
+    <noscript><p class="m-0 text-sm font-semibold text-warn">{t.noscript}</p></noscript>
+  </div>
+</form>

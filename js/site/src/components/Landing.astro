@@ -1,0 +1,42 @@
+---
+import { clientJson } from "../i18n/client.ts";
+import { fmt } from "../i18n/format.ts";
+import { type Lang, strings } from "../i18n/index.ts";
+import { chatCount } from "../lib/signals.ts";
+import CheckerSection from "./CheckerSection.astro";
+import Detects from "./Detects.astro";
+import Footer from "./Footer.astro";
+import Header from "./Header.astro";
+import Hero from "./Hero.astro";
+import Install from "./Install.astro";
+import Layout from "./Layout.astro";
+import LogSection from "./LogSection.astro";
+import Media from "./Media.astro";
+import SignupBand from "./SignupBand.astro";
+import Stats from "./Stats.astro";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = strings(lang);
+---
+<Layout lang={lang} title={t.meta.title} description={fmt(t.meta.description, { others: chatCount - 2 })}>
+  <a href="#top" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-20 focus:rounded-btn focus:bg-surface focus:px-4 focus:py-3 focus:font-semibold">{t.skip}</a>
+  <main>
+    <div class="hero-bg flex flex-col border-b border-line">
+      <Header lang={lang} />
+      <Hero lang={lang} />
+    </div>
+    <Stats lang={lang} />
+    <CheckerSection lang={lang} />
+    <LogSection lang={lang} />
+    <Install lang={lang} />
+    <Detects lang={lang} />
+    <Media lang={lang} />
+    <SignupBand lang={lang} />
+  </main>
+  <Footer lang={lang} />
+  <script is:inline type="application/json" id="rl-strings" set:html={clientJson(lang)}></script>
+</Layout>

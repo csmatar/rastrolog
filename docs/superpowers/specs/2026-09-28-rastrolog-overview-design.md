@@ -45,8 +45,8 @@ rastrolog/
 ├─ python/                      uv project, published as PyPI "rastrolog"
 ├─ js/                          pnpm workspace
 │  ├─ core/                     private TS package: classifiers, codegen, log parser, robots parser
-│  └─ snippet/                  published as npm "rastrolog"
-├─ site/                        Astro static landing page
+│  ├─ snippet/                  published as npm "rastrolog"
+│  └─ site/                     Astro static landing page (private)
 ├─ docs/superpowers/{specs,plans}/
 ├─ .claude/settings.json        project Claude Code settings (attribution disabled)
 ├─ CLAUDE.md

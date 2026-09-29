@@ -1,0 +1,49 @@
+---
+import { fmt } from "../i18n/format.ts";
+import { type Lang, strings } from "../i18n/index.ts";
+import {
+  chatCount,
+  crawlerCount,
+  documentedCount,
+  referrerProducts,
+  vendors,
+} from "../lib/signals.ts";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = strings(lang).detects;
+---
+<section id="detects" aria-labelledby="detects-h2" class="flex flex-col gap-3 px-5 pt-12 md:gap-5 md:px-[120px] md:pt-[88px]">
+  <h2 id="detects-h2" class="m-0 font-mono text-2xl leading-tight font-extrabold tracking-[-0.02em] md:text-[34px]">{t.h2}</h2>
+  <p class="m-0 text-[15px] text-muted md:text-base">{fmt(t.body, { crawlers: crawlerCount, chats: chatCount, documented: documentedCount })} <a href="https://github.com/csmatar/rastrolog/blob/main/signals.json">{t.listLink}</a>.</p>
+  <div class="grid items-start gap-6 md:grid-cols-3">
+    <table class="w-full border-separate border-spacing-0 overflow-hidden rounded-panel border border-line bg-surface text-sm md:col-span-2">
+      <caption class="sr-only">{t.caption}</caption>
+      <thead>
+        <tr class="bg-surface-2 font-mono text-xs tracking-[0.06em] text-muted uppercase">
+          <th scope="col" class="px-4 py-2 text-left font-normal md:px-5">{t.vendorCol}</th>
+          <th scope="col" class="px-4 py-2 text-left font-normal md:px-5">{t.tokensCol}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {vendors().map((v) => (
+          <tr>
+            <th scope="row" class="border-t border-line-soft px-4 py-2.5 text-left align-top font-semibold md:px-5">{v.name}</th>
+            <td class="border-t border-line-soft px-4 py-2.5 font-mono text-muted md:px-5">
+              {v.crawlers.map((c, i) => (
+                <Fragment>{i > 0 && " · "}<a href={c.docsUrl} class="text-muted underline decoration-line underline-offset-2 hover:text-accent">{c.token}</a>{!c.vendorDocumented && ` (${t.thirdParty})`}</Fragment>
+              ))}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <div class="flex flex-col gap-2.5 rounded-panel border border-line bg-surface px-5 py-[18px]">
+      <h3 class="m-0 font-mono text-base font-bold">{t.referrers}</h3>
+      <p class="m-0 font-mono text-sm leading-8 text-muted">{referrerProducts.join(" · ")}</p>
+    </div>
+  </div>
+</section>

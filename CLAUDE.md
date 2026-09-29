@@ -3,8 +3,7 @@
 Open-source classifier for AI crawler and AI referral traffic. Three deliverables share one data file:
 
 - `python/`: PyPI package `rastrolog` (library, CLI, FastAPI/Django middleware), managed with **uv**
-- `js/`: pnpm workspace; `js/core` (private shared TS) and `js/snippet` (npm `rastrolog`)
-- `site/`: Astro static landing page
+- `js/`: pnpm workspace; `js/core` (private shared TS), `js/snippet` (npm `rastrolog`) and `js/site` (the Astro landing page, private)
 
 Specs live in `docs/superpowers/specs/`, plans in `docs/superpowers/plans/`. Read the overview spec first.
 
@@ -41,6 +40,16 @@ pnpm run build                               # js/snippet/dist: snippet.min.js, 
 pnpm --filter rastrolog run test:bundle      # forbidden network APIs + published types
 pnpm --filter rastrolog run size             # ≤ 2 KB gzipped
 pnpm --filter rastrolog run e2e              # Playwright (needs a build and `playwright install chromium`)
+```
+
+Site (run from `js/`; config and the Kit setup are in `js/site/README.md`):
+
+```bash
+pnpm --filter rastrolog run build                # the site serves the built snippet
+pnpm --filter @rastrolog/site run dev            # http://localhost:4321
+pnpm --filter @rastrolog/site run build          # js/site/dist
+pnpm --filter @rastrolog/site run e2e            # Playwright + axe against astro preview (after a build)
+pnpm --filter @rastrolog/site run lhci           # Lighthouse budgets (after a build)
 ```
 
 `js/core/src/*.gen.ts` are generated from `signals.json` by `js/core/scripts/codegen.ts` and gitignored.

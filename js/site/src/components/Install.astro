@@ -1,0 +1,31 @@
+---
+import { type Lang, strings } from "../i18n/index.ts";
+import { PINNED_SNIPPET_TAG } from "../lib/snippet-tag.ts";
+import CodeBlock from "./CodeBlock.astro";
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = strings(lang).install;
+---
+<section id="install" aria-labelledby="install-h2" class="flex flex-col gap-3.5 px-5 pt-12 md:gap-[22px] md:px-[120px] md:pt-[88px]">
+  <h2 id="install-h2" class="m-0 font-mono text-2xl leading-tight font-extrabold tracking-[-0.02em] md:text-[34px]">{t.h2}</h2>
+  <div class="grid gap-6 md:grid-cols-2">
+    <div class="flex flex-col gap-2.5">
+      <h3 class="m-0 text-base font-semibold md:text-[17px]">{t.pythonTitle}</h3>
+      <p class="m-0 text-[15px] text-muted">{t.pythonBody}</p>
+      <CodeBlock lines={["pip install rastrolog", "rastrolog parse access.log"]} prompt copy={t.copy} copied={t.copied} />
+    </div>
+    <div class="flex flex-col gap-2.5">
+      <h3 class="m-0 text-base font-semibold md:text-[17px]">{t.snippetTitle}</h3>
+      <p class="m-0 text-[15px] text-muted">{t.snippetBefore} <code class="font-mono text-ink">ai_referral</code> {t.snippetAfter}</p>
+      <CodeBlock lines={[PINNED_SNIPPET_TAG]} highlight copy={t.copy} copied={t.copied} />
+    </div>
+  </div>
+</section>
+
+<script>
+  import "../scripts/copy.ts";
+</script>
