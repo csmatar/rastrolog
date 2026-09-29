@@ -9,11 +9,14 @@
     "preview": "astro preview --port 4321",
     "typecheck": "pnpm run codegen && tsc -p tsconfig.json",
     "test": "pnpm run codegen && vitest run",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "lhci": "lhci autorun"
   },
   "devDependencies": {
-    "@fontsource/ibm-plex-sans": "^5.3.0",
-    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@axe-core/playwright": "^4.13.0",
+    "@fontsource-variable/ibm-plex-sans": "^5.3.0",
+    "@fontsource-variable/jetbrains-mono": "^5.3.0",
+    "@lhci/cli": "^0.15.1",
     "@playwright/test": "^1.62.0",
     "@rastrolog/core": "workspace:*",
     "@tailwindcss/vite": "^4.3.3",

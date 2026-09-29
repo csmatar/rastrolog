@@ -6,31 +6,31 @@ import { siteConfig } from "./site.config.ts";
 // signals.json lives at the repo root, two levels up.
 const repoRoot = fileURLToPath(new URL("../..", import.meta.url));
 
-/** A family served from a pinned @fontsource package's latin woff2 files. */
+/**
+ * A family served from a pinned @fontsource-variable package's latin woff2: one file
+ * covers every weight, so the page loads two font files instead of eight.
+ */
 function fontsource(
   pkg: string,
   name: string,
   cssVariable: string,
-  weights: [number, ...number[]],
+  weights: string,
   fallback: string,
 ) {
-  const variant = (weight: number) => ({
-    weight,
-    style: "normal" as const,
-    display: "swap" as const,
-    src: [`@fontsource/${pkg}/files/${pkg}-latin-${weight}-normal.woff2`] as [string],
-  });
-  const [first, ...rest] = weights;
   return {
     provider: fontProviders.local(),
     name,
     cssVariable,
     fallbacks: [fallback],
     options: {
-      variants: [variant(first), ...rest.map(variant)] as [
-        ReturnType<typeof variant>,
-        ...ReturnType<typeof variant>[],
-      ],
+      variants: [
+        {
+          weight: weights,
+          style: "normal" as const,
+          display: "swap" as const,
+          src: [`@fontsource-variable/${pkg}/files/${pkg}-latin-wght-normal.woff2`] as [string],
+        },
+      ] as [{ weight: string; style: "normal"; display: "swap"; src: [string] }],
     },
   };
 }
@@ -43,20 +43,8 @@ export default defineConfig({
   i18n: { locales: ["en", "es"], defaultLocale: "en", routing: { prefixDefaultLocale: false } },
   devToolbar: { enabled: false },
   fonts: [
-    fontsource(
-      "jetbrains-mono",
-      "JetBrains Mono",
-      "--font-jetbrains-mono",
-      [400, 500, 700, 800],
-      "monospace",
-    ),
-    fontsource(
-      "ibm-plex-sans",
-      "IBM Plex Sans",
-      "--font-plex-sans",
-      [400, 500, 600, 700],
-      "sans-serif",
-    ),
+    fontsource("jetbrains-mono", "JetBrains Mono", "--font-jetbrains-mono", "100 800", "monospace"),
+    fontsource("ibm-plex-sans", "IBM Plex Sans", "--font-plex-sans", "100 700", "sans-serif"),
   ],
   vite: {
     plugins: [tailwindcss()],

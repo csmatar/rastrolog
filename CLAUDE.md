@@ -42,6 +42,15 @@ pnpm --filter rastrolog run size             # ≤ 2 KB gzipped
 pnpm --filter rastrolog run e2e              # Playwright (needs a build and `playwright install chromium`)
 ```
 
+Site (run from `js/`; config and the Kit setup are in `js/site/README.md`):
+
+```bash
+pnpm --filter rastrolog run build                # the site serves the built snippet
+pnpm --filter @rastrolog/site run dev            # http://localhost:4321
+pnpm --filter @rastrolog/site run build          # js/site/dist
+pnpm --filter @rastrolog/site run e2e            # Playwright + axe against astro preview (after a build)
+pnpm --filter @rastrolog/site run lhci           # Lighthouse budgets (after a build)
+
 `js/core/src/*.gen.ts` are generated from `signals.json` by `js/core/scripts/codegen.ts` and gitignored.
 
 Pre-commit: `cd python && uv run pre-commit install` once; hooks run ruff, mypy, JSON/YAML checks, and the signals.json schema check.
