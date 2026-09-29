@@ -24,6 +24,12 @@ fixture (with a human decision) rather than skip it in one implementation.
   `cd python && uv run python scripts/write_golden.py` after an intentional
   behaviour change, and review the diff before committing: an unreviewed
   change here breaks parity with the TS port.
+- `log_lines.json`: line-level cases. Each case runs its `lines` through one
+  parser of its `format`, in order (CloudFront `#Fields:` headers change the
+  parser's state). Each line becomes a record, `"ignored"` (a `#` header), or
+  `"malformed"` (counted as skipped). Record `ts` is whole-second UTC like
+  `last_seen`. Regenerate with `cd python && uv run python
+  scripts/write_log_line_cases.py`; the inputs live in that script.
 
 ## `user_agents.json` case shape
 
@@ -210,6 +216,46 @@ CloudFront logs the path and the query in separate fields (`cs-uri-stem`,
   a malformed escape such as `%zz` is kept literally. (JavaScript's
   `decodeURIComponent` throws on both, so a port needs its own decoder.)
 - `cs(User-Agent)` and `cs(Referer)` are percent-decoded too.
+
+### Log line parsing
+
+These rules are what `python/src/rastrolog/{formats,parse}.py` does; the TypeScript
+port in `js/core/src/logs/` mirrors them.
+
+- **Reading.** gzip is detected by magic bytes (`1f 8b`), not by extension, and
+  multi-member gzip files are read to the end. Text is UTF-8 with invalid bytes
+  replaced by U+FFFD. A leading BOM is **kept**, as part of the first line.
+  Lines end at `\r\n`, `\r` or `\n`. Blank lines (only whitespace) count toward
+  `lines` but are otherwise ignored. A truncated or corrupt gzip keeps every
+  complete line read so far, drops the partial one, and marks the result
+  truncated.
+- **Detection.** The first non-blank line, stripped, picks the format:
+  - `#Version:`, `#Fields:` or `YYYY-MM-DD<TAB>HH:MM:SS<TAB>` means CloudFront;
+  - otherwise the ALB pattern means ALB;
+  - otherwise the combined pattern means combined;
+  - otherwise it's an unknown format, reported with that line.
+- **Whitespace.** "Whitespace" is Python's `str.isspace()` set: `\t`–`\r`,
+  `\x1c`–`\x20`, `\x85`, `\xa0`, `\u1680`, `\u2000`–`\u200a`, `\u2028`,
+  `\u2029`, `\u202f`, `\u205f` and `\u3000`. It includes `\x1c`–`\x1f` and
+  `\x85` and excludes the BOM (U+FEFF), which differs from JavaScript's `\s` and
+  `trim()`.
+- **Combined.**
+  - Quoted fields undo `\"` and `\xHH` escapes. The request target is its second
+    space-separated word.
+  - The CLF time `DD/Mon/YYYY:HH:MM:SS ±HHMM` must be a real date (31 February is
+    malformed), with an offset under 24 hours, converted to UTC.
+  - A status of `-` becomes 0, and a `-` referrer or user agent becomes empty.
+- **ALB.** The time must be ISO 8601 as ALB writes it
+  (`YYYY-MM-DDTHH:MM:SS[.ffffff]Z`). There's no referrer field.
+- **CloudFront.** `#Fields:` sets the column positions; if it lacks any of date,
+  time, `cs-uri-stem`, `sc-status`, `cs(Referer)` or `cs(User-Agent)`, that
+  header line is malformed and the previous positions stay. Before a header,
+  the standard 33-column order applies. User agent and referrer are
+  percent-decoded (see Path normalisation for the stem).
+- **Known gaps between the ports** (never hit by real logs): Python's `int()`
+  accepts non-ASCII digits, and Python 3.11+'s `fromisoformat` accepts more ISO
+  forms than ALB or CloudFront ever write. The TypeScript port accepts ASCII
+  digits and the ALB/CloudFront forms only.
 
 ### Golden generation parameters
 

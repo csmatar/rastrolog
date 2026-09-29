@@ -1,0 +1,280 @@
+[
+  {
+    "name": "combined-basic",
+    "format": "combined",
+    "lines": [
+      "203.0.113.9 - - [28/Sep/2026:12:00:00 +0000] \"GET /pricing?utm_source=chatgpt.com HTTP/1.1\" 200 512 \"https://chatgpt.com/\" \"Mozilla/5.0\""
+    ],
+    "expect": [
+      {
+        "ts": "2026-09-28T12:00:00+00:00",
+        "path": "/pricing",
+        "status": 200,
+        "ua": "Mozilla/5.0",
+        "referrer": "https://chatgpt.com/"
+      }
+    ]
+  },
+  {
+    "name": "combined-offset-fragment-dashes",
+    "format": "combined",
+    "lines": [
+      "203.0.113.9 - - [28/Sep/2026:12:00:00 +0530] \"GET /a#frag HTTP/1.1\" - 0 \"-\" \"-\""
+    ],
+    "expect": [
+      {
+        "ts": "2026-09-28T06:30:00+00:00",
+        "path": "/a",
+        "status": 0,
+        "ua": "",
+        "referrer": ""
+      }
+    ]
+  },
+  {
+    "name": "combined-offset-crosses-year",
+    "format": "combined",
+    "lines": [
+      "1.2.3.4 - - [01/Jan/2027:00:30:00 +0100] \"GET / HTTP/1.1\" 200 5 \"-\" \"x\""
+    ],
+    "expect": [
+      {
+        "ts": "2026-12-31T23:30:00+00:00",
+        "path": "/",
+        "status": 200,
+        "ua": "x",
+        "referrer": ""
+      }
+    ]
+  },
+  {
+    "name": "combined-apache-escaped-quote",
+    "format": "combined",
+    "lines": [
+      "1.2.3.4 - - [28/Sep/2026:12:00:00 +0000] \"GET / HTTP/1.1\" 200 5 \"-\" \"Mozilla \\\"quoted\\\" x\""
+    ],
+    "expect": [
+      {
+        "ts": "2026-09-28T12:00:00+00:00",
+        "path": "/",
+        "status": 200,
+        "ua": "Mozilla \"quoted\" x",
+        "referrer": ""
+      }
+    ]
+  },
+  {
+    "name": "combined-nginx-hex-escape",
+    "format": "combined",
+    "lines": [
+      "1.2.3.4 - - [28/Sep/2026:12:00:00 +0000] \"GET / HTTP/1.1\" 200 5 \"-\" \"Mozilla \\x22hex\\x22 x\""
+    ],
+    "expect": [
+      {
+        "ts": "2026-09-28T12:00:00+00:00",
+        "path": "/",
+        "status": 200,
+        "ua": "Mozilla \"hex\" x",
+        "referrer": ""
+      }
+    ]
+  },
+  {
+    "name": "combined-absolute-target",
+    "format": "combined",
+    "lines": [
+      "1.2.3.4 - - [28/Sep/2026:12:00:00 +0000] \"GET https://example.com/a?b HTTP/1.1\" 200 5 \"-\" \"x\""
+    ],
+    "expect": [
+      {
+        "ts": "2026-09-28T12:00:00+00:00",
+        "path": "/a",
+        "status": 200,
+        "ua": "x",
+        "referrer": ""
+      }
+    ]
+  },
+  {
+    "name": "combined-no-target",
+    "format": "combined",
+    "lines": [
+      "1.2.3.4 - - [28/Sep/2026:12:00:00 +0000] \"-\" 400 0 \"-\" \"-\""
+    ],
+    "expect": [
+      {
+        "ts": "2026-09-28T12:00:00+00:00",
+        "path": "-",
+        "status": 400,
+        "ua": "",
+        "referrer": ""
+      }
+    ]
+  },
+  {
+    "name": "combined-unparseable-absolute-target",
+    "format": "combined",
+    "lines": [
+      "1.2.3.4 - - [28/Sep/2026:12:00:00 +0000] \"GET http://[::1/x HTTP/1.1\" 200 5 \"-\" \"x\""
+    ],
+    "expect": [
+      {
+        "ts": "2026-09-28T12:00:00+00:00",
+        "path": "-",
+        "status": 200,
+        "ua": "x",
+        "referrer": ""
+      }
+    ]
+  },
+  {
+    "name": "combined-invalid-date",
+    "format": "combined",
+    "lines": [
+      "1.2.3.4 - - [31/Feb/2026:12:00:00 +0000] \"GET / HTTP/1.1\" 200 5 \"-\" \"x\""
+    ],
+    "expect": [
+      "malformed"
+    ]
+  },
+  {
+    "name": "combined-unknown-month",
+    "format": "combined",
+    "lines": [
+      "1.2.3.4 - - [28/Foo/2026:12:00:00 +0000] \"GET / HTTP/1.1\" 200 5 \"-\" \"x\""
+    ],
+    "expect": [
+      "malformed"
+    ]
+  },
+  {
+    "name": "combined-offset-24h",
+    "format": "combined",
+    "lines": [
+      "1.2.3.4 - - [28/Sep/2026:12:00:00 +2400] \"GET / HTTP/1.1\" 200 5 \"-\" \"x\""
+    ],
+    "expect": [
+      "malformed"
+    ]
+  },
+  {
+    "name": "combined-leading-space",
+    "format": "combined",
+    "lines": [
+      " 1.2.3.4 - - [28/Sep/2026:12:00:00 +0000] \"GET / HTTP/1.1\" 200 5 \"-\" \"x\""
+    ],
+    "expect": [
+      "malformed"
+    ]
+  },
+  {
+    "name": "cloudfront-header-then-encoded-stem",
+    "format": "cloudfront",
+    "lines": [
+      "#Version: 1.0",
+      "#Fields: date time cs-uri-stem sc-status cs(Referer) cs(User-Agent)",
+      "2026-09-20\t08:00:00\t/a%3Fb\t200\thttps://claude.ai/\tMozilla/5.0%20(x)"
+    ],
+    "expect": [
+      "ignored",
+      "ignored",
+      {
+        "ts": "2026-09-20T08:00:00+00:00",
+        "path": "/a?b",
+        "status": 200,
+        "ua": "Mozilla/5.0 (x)",
+        "referrer": "https://claude.ai/"
+      }
+    ]
+  },
+  {
+    "name": "cloudfront-default-fields-invalid-utf8",
+    "format": "cloudfront",
+    "lines": [
+      "2026-09-20\t08:00:00\tLAX1\t5\t1.2.3.4\tGET\th\t/caf%C3%A9%FF\t200\t-\tMozilla/5.0\t-"
+    ],
+    "expect": [
+      {
+        "ts": "2026-09-20T08:00:00+00:00",
+        "path": "/café�",
+        "status": 200,
+        "ua": "Mozilla/5.0",
+        "referrer": ""
+      }
+    ]
+  },
+  {
+    "name": "cloudfront-short-line",
+    "format": "cloudfront",
+    "lines": [
+      "2026-09-20\t08:00:00\tLAX1"
+    ],
+    "expect": [
+      "malformed"
+    ]
+  },
+  {
+    "name": "cloudfront-invalid-date",
+    "format": "cloudfront",
+    "lines": [
+      "2026-13-01\t08:00:00\tLAX1\t5\t1.2.3.4\tGET\th\t/\t200\t-\tx\t-"
+    ],
+    "expect": [
+      "malformed"
+    ]
+  },
+  {
+    "name": "cloudfront-header-missing-fields",
+    "format": "cloudfront",
+    "lines": [
+      "#Fields: date time sc-status",
+      "2026-09-20\t08:00:00\t200"
+    ],
+    "expect": [
+      "malformed",
+      "malformed"
+    ]
+  },
+  {
+    "name": "alb-microseconds",
+    "format": "alb",
+    "lines": [
+      "https 2026-09-20T08:00:00.186641Z app/lb/1 1.2.3.4:1 10.0.0.1:80 0.0 0.0 0.0 200 200 1 2 \"GET https://www.example.com:443/docs?a=b HTTP/1.1\" \"Mozilla/5.0 (compatible; GPTBot/1.4; +https://openai.com/gptbot)\" x"
+    ],
+    "expect": [
+      {
+        "ts": "2026-09-20T08:00:00+00:00",
+        "path": "/docs",
+        "status": 200,
+        "ua": "Mozilla/5.0 (compatible; GPTBot/1.4; +https://openai.com/gptbot)",
+        "referrer": ""
+      }
+    ]
+  },
+  {
+    "name": "alb-no-fraction-no-path-dash-status",
+    "format": "alb",
+    "lines": [
+      "https 2026-09-20T08:00:00Z app/lb/1 1.2.3.4:1 10.0.0.1:80 0.0 0.0 0.0 - - 1 2 \"GET https://www.example.com:443 HTTP/1.1\" \"-\" x"
+    ],
+    "expect": [
+      {
+        "ts": "2026-09-20T08:00:00+00:00",
+        "path": "/",
+        "status": 0,
+        "ua": "",
+        "referrer": ""
+      }
+    ]
+  },
+  {
+    "name": "alb-invalid-time",
+    "format": "alb",
+    "lines": [
+      "https 2026-09-20Tgarbage app/lb/1 1.2.3.4:1 10.0.0.1:80 0.0 0.0 0.0 200 200 1 2 \"GET / HTTP/1.1\" \"x\" x"
+    ],
+    "expect": [
+      "malformed"
+    ]
+  }
+]
