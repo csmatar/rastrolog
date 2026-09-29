@@ -7,5 +7,6 @@ packages:
 minimumReleaseAge: 10080
 
 # pnpm blocks dependency lifecycle scripts by default; allow only what needs one.
-onlyBuiltDependencies:
-  - esbuild
+# (esbuild's postinstall verifies its platform binary.)
+allowBuilds:
+  esbuild: true
