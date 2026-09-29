@@ -1,0 +1,24 @@
+{
+  "name": "@rastrolog/site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "codegen": "node ../core/scripts/codegen.ts",
+    "dev": "pnpm run codegen && astro dev",
+    "build": "pnpm run codegen && astro build",
+    "preview": "astro preview --port 4321",
+    "typecheck": "pnpm run codegen && tsc -p tsconfig.json",
+    "test": "pnpm run codegen && vitest run",
+    "e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@fontsource/ibm-plex-sans": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@playwright/test": "^1.62.0",
+    "@rastrolog/core": "workspace:*",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.3.3",
+    "rastrolog": "workspace:*",
+    "tailwindcss": "^4.3.3"
+  }
+}

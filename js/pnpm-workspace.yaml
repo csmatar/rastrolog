@@ -1,6 +1,7 @@
 packages:
   - core
   - snippet
+  - site
 
 # Supply chain: never resolve a version published less than 7 days ago
 # (minutes; matches Dependabot's 7-day cooldown in .github/dependabot.yml).

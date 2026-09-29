@@ -3,8 +3,7 @@
 Open-source classifier for AI crawler and AI referral traffic. Three deliverables share one data file:
 
 - `python/`: PyPI package `rastrolog` (library, CLI, FastAPI/Django middleware), managed with **uv**
-- `js/`: pnpm workspace; `js/core` (private shared TS) and `js/snippet` (npm `rastrolog`)
-- `site/`: Astro static landing page
+- `js/`: pnpm workspace; `js/core` (private shared TS), `js/snippet` (npm `rastrolog`) and `js/site` (the Astro landing page, private)
 
 Specs live in `docs/superpowers/specs/`, plans in `docs/superpowers/plans/`. Read the overview spec first.
 

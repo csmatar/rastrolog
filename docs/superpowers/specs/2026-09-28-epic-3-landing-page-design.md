@@ -156,7 +156,7 @@ Results are never gated. The page asks for an email in three places, each tied t
 
 ### Deploy
 
-Cloudflare Pages, `site/` build output, deployed by `release.yml` on tag (preview deploys on PRs). Production domain is a config value.
+Cloudflare Pages, `js/site/dist` build output, deployed by `release.yml` on tag (preview deploys on PRs). Production domain is a config value.
 
 ## Error handling summary
 
