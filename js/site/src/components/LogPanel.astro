@@ -9,7 +9,7 @@ interface Props {
 const { lang, class: className } = Astro.props;
 const t = strings(lang).logPanel;
 ---
-<div data-log-drop class:list={[className, "overflow-hidden rounded-panel border border-line bg-surface shadow-panel data-[dragging]:border-accent data-[dragging]:ring-2 data-[dragging]:ring-accent"]}>
+<div id="log-panel" data-log-drop class:list={[className, "overflow-hidden rounded-panel border border-line bg-surface shadow-panel data-[dragging]:border-accent data-[dragging]:ring-2 data-[dragging]:ring-accent"]}>
   <div class="flex items-center justify-between gap-3 border-b border-line bg-surface-2 px-4 py-2.5 font-mono text-xs text-muted md:px-[18px] md:py-3 md:text-[13px]">
     <span><span class="font-bold text-brand" aria-hidden="true">$</span> {t.title}</span>
     <span>{t.formats}</span>

@@ -6,7 +6,7 @@ export default defineConfig({
   reporter: process.env.CI ? "github" : "list",
   use: { baseURL: "http://localhost:4321" },
   webServer: {
-    command: "pnpm run preview",
+    command: "pnpm exec astro preview --port 4321 --ignore-lock", // Astro backgrounds preview when an AI agent runs it
     url: "http://localhost:4321/",
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,

@@ -51,8 +51,6 @@ export const en = {
   },
   checker: {
     h2: "AI crawler robots.txt checker",
-    intro:
-      "Type a domain above. You get a verdict for each of the {crawlers} crawlers rastrolog knows, with the robots.txt lines behind it.",
     input: {
       empty: "Type a domain first, like example.com.",
       invalid: "That doesn't look like a domain. Try example.com.",
@@ -157,8 +155,6 @@ export const en = {
   },
   logs: {
     h2: "See ChatGPT and Perplexity traffic in your logs",
-    intro:
-      "Drop an access log above, or paste a few lines. rastrolog reads nginx, Apache, CloudFront and AWS ALB logs, gzipped or not.",
     reading: "Reading {name} in your browser",
     progress: "{read} of {total} MB",
     progressUnknown: "{read} MB read",

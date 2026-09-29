@@ -54,6 +54,7 @@ async function check(raw: string): Promise<void> {
     return;
   }
   setInputError(null);
+  section.hidden = false;
   const site = siteOf(parsed.origin);
   input.value = site;
   history.replaceState(null, "", reportUrl(location.pathname, site));

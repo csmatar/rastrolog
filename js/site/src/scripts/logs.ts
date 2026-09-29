@@ -35,6 +35,7 @@ function start(job: LogJob, name: string, size: number | null): void {
   const w = new Worker(new URL("./log-worker.ts", import.meta.url), { type: "module" });
   worker = w;
   last = { job, name, size };
+  section.hidden = false;
   unknown.hidden = true;
   message.hidden = true;
   result.hidden = true;

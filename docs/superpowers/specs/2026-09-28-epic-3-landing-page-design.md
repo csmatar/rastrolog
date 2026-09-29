@@ -59,7 +59,7 @@ Dark mode is out of scope: the page ships light only.
 6. Articles and video: section hidden until URLs are set in `site.config.ts`; YouTube via click-to-load facade (no iframe until click).
 7. Signup band (crawler alerts) with a sample alert email beside the form, then the footer with the GitHub link.
 
-Sections 2 and 3 always render their `h2` and a one-line description in the static HTML, because the `h2`s are the SEO targets. Results and the email ask appear under them only after the tool runs.
+Sections 2 and 3 stay hidden until their tool runs (decided 2026-09-29: an empty heading under the hero looked unfinished). Their `h2`s are still in the static HTML, with the `hidden` attribute, so search engines see them, though likely with less weight than visible text. The header's Checker and Log analyzer links point at the tool panels in the hero.
 
 ### Visual design (direction C)
 

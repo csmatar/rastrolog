@@ -53,8 +53,6 @@ export const es: Strings = {
   },
   checker: {
     h2: "Bloquear GPTBot y otros bots de IA en robots.txt",
-    intro:
-      "Escribe un dominio arriba. Verás un veredicto para cada uno de los {crawlers} rastreadores que rastrolog conoce, con las líneas de robots.txt que lo explican.",
     input: {
       empty: "Primero escribe un dominio, como example.com.",
       invalid: "Eso no parece un dominio. Prueba con example.com.",
@@ -182,8 +180,6 @@ export const es: Strings = {
   },
   logs: {
     h2: "Tráfico desde ChatGPT en tus logs",
-    intro:
-      "Suelta un log de acceso arriba o pega algunas líneas. rastrolog lee logs de nginx, Apache, CloudFront y AWS ALB, comprimidos o no.",
     reading: "Leyendo {name} en tu navegador",
     progress: "{read} de {total} MB",
     progressUnknown: "{read} MB leídos",

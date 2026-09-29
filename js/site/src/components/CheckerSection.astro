@@ -1,7 +1,5 @@
 ---
-import { fmt } from "../i18n/format.ts";
 import { type Lang, strings } from "../i18n/index.ts";
-import { crawlerCount } from "../lib/signals.ts";
 import EmailAsk from "./EmailAsk.astro";
 
 interface Props {
@@ -15,9 +13,8 @@ const button =
   "h-11 self-start rounded-btn bg-brand px-[22px] font-mono text-sm font-extrabold text-white hover:bg-accent md:h-12 md:text-[15px]";
 const area = "w-full rounded-btn border border-line bg-code p-3.5 font-mono text-sm text-ink";
 ---
-<section id="checker" aria-labelledby="checker-h2" class="flex flex-col gap-3.5 px-5 pt-12 md:gap-[22px] md:px-[120px] md:pt-[88px]">
+<section id="checker" hidden aria-labelledby="checker-h2" class="flex flex-col gap-3.5 px-5 pt-12 md:gap-[22px] md:px-[120px] md:pt-[88px]">
   <h2 id="checker-h2" class="m-0 font-mono text-2xl leading-tight font-extrabold tracking-[-0.02em] md:text-[34px]">{c.h2}</h2>
-  <p class="m-0 max-w-[860px] text-muted">{fmt(c.intro, { crawlers: crawlerCount })}</p>
   <p data-checker-status role="status" class="m-0 font-mono text-sm text-muted empty:hidden"></p>
 
   <div data-checker-paste hidden class="flex flex-col gap-3.5 rounded-panel border border-warn bg-surface p-4 md:px-[26px] md:py-6">
