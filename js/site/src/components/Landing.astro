@@ -12,6 +12,7 @@ import Install from "./Install.astro";
 import Layout from "./Layout.astro";
 import LogSection from "./LogSection.astro";
 import Media from "./Media.astro";
+import SignupBand from "./SignupBand.astro";
 import Stats from "./Stats.astro";
 
 interface Props {
@@ -34,6 +35,7 @@ const t = strings(lang);
     <Install lang={lang} />
     <Detects lang={lang} />
     <Media lang={lang} />
+    <SignupBand lang={lang} />
   </main>
   <Footer lang={lang} />
   <script is:inline type="application/json" id="rl-strings" set:html={clientJson(lang)}></script>

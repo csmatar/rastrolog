@@ -62,3 +62,30 @@ export async function serveSite(
 export const NGINX_LOG = fileURLToPath(
   new URL("../../../conformance/logs/nginx.log", import.meta.url),
 );
+export interface KitPost {
+  url: string;
+  fields: Record<string, string>;
+}
+
+/** Record every Kit form POST; answer with the given statuses in turn (the last one repeats). */
+export async function routeKit(
+  page: Page,
+  statuses: readonly number[] = [200],
+): Promise<KitPost[]> {
+  const posts: KitPost[] = [];
+  await page.route("https://app.kit.com/forms/**", async (route) => {
+    const request = route.request();
+    posts.push({
+      url: request.url(),
+      fields: Object.fromEntries(new URLSearchParams(request.postData() ?? "")),
+    });
+    const status = statuses[Math.min(posts.length, statuses.length) - 1] ?? 200;
+    await route.fulfill({
+      status,
+      contentType: "application/json",
+      headers: { "access-control-allow-origin": "*" },
+      body: JSON.stringify({ status: status === 200 ? "success" : "failed" }),
+    });
+  });
+  return posts;
+}

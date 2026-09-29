@@ -2,6 +2,7 @@
 import { fmt } from "../i18n/format.ts";
 import { type Lang, strings } from "../i18n/index.ts";
 import { crawlerCount } from "../lib/signals.ts";
+import EmailAsk from "./EmailAsk.astro";
 
 interface Props {
   lang: Lang;
@@ -46,6 +47,7 @@ const area = "w-full rounded-btn border border-line bg-code p-3.5 font-mono text
       <p data-f="sub" class="m-0 text-base text-muted md:text-lg"></p>
     </div>
     <ul data-f="summary" class="m-0 flex list-none flex-col gap-2 rounded-panel border border-line bg-surface p-4 font-mono text-sm leading-[1.7] md:px-6 md:py-5 md:text-base md:leading-[1.85]"></ul>
+    <EmailAsk lang={lang} variant="checker" />
     <div data-f="groups" class="flex flex-col gap-3.5 md:gap-[18px]"></div>
   </div>
 
