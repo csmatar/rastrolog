@@ -16,6 +16,7 @@ One static page, in English at `/` and Spanish at `/es/`, with two working tools
 - Kit signup works with and without JavaScript, and routes to the right form.
 - No email field appears before a result, and no result is hidden behind one.
 - A `/?check=<domain>` link runs the check on load, so the link in the Kit confirmation email reopens the visitor's report.
+- `https://rastrolog.com` and `/es/` serve the site with the production headers, `www.rastrolog.com` redirects to it, and Porkbun email forwarding still works after the DNS move.
 
 ## Phase A: design review (gate)
 
@@ -152,11 +153,62 @@ Results are never gated. The page asks for an email in three places, each tied t
 
 ### Analytics
 
-`rastrolog` snippet (dogfooding) + Cloudflare Web Analytics. Nothing else.
+`rastrolog` snippet (dogfooding) + Cloudflare Web Analytics. Nothing else. Web Analytics is switched on in the Pages project, which injects its beacon at the edge; the HTML in the repo carries no analytics script.
 
 ### Deploy
 
-Cloudflare Pages, `js/site/dist` build output, deployed by `release.yml` on tag (preview deploys on PRs). Production domain is a config value.
+Decided 2026-09-29, replacing "deployed by `release.yml` on tag".
+
+**How it deploys.** Cloudflare Pages' Git integration builds and deploys the site. GitHub holds no Cloudflare credentials. Cloudflare has no GitHub OIDC trust yet, and every Actions-based deploy needs a long-lived API token. Cloudflare's GitHub app gets read access to `csmatar/rastrolog` only.
+
+- A merge to `main` that touches the site deploys production. The site follows `main` rather than release tags, and the snippet tag it shows only changes when a release PR updates the README.
+- Every PR gets a preview deployment. Cloudflare marks previews `X-Robots-Tag: noindex`.
+- Watch paths are `js/**`, `signals.json` and `README.md`. Python-only changes don't redeploy.
+
+**Pages project settings**
+
+| Setting | Value |
+| --- | --- |
+| Production branch | `main` |
+| Root directory | `js` |
+| Build command | `pnpm install --frozen-lockfile && pnpm --filter rastrolog run build && pnpm --filter @rastrolog/site run build` |
+| Output directory | `site/dist` |
+| `NODE_VERSION`, `PNPM_VERSION` | 24, and the version in `js/package.json`'s `packageManager` |
+| Production variables | `SITE_URL=https://rastrolog.com`, `KIT_FORM_GENERAL`, `KIT_FORM_LATAM`, `RASTROLOG_SITE_RELEASE=1` |
+| Preview variables | none: `site.config.ts` falls back to `CF_PAGES_URL` for the site URL and keeps the placeholder Kit IDs, so a preview never subscribes anyone |
+
+The build installs from the lockfile with `minimumReleaseAge` in force, because it's set in `pnpm-workspace.yaml`. `RASTROLOG_SITE_RELEASE=1` makes a missing `SITE_URL` or Kit form ID fail the production build.
+
+**Headers** (`js/site/public/_headers`, applied by Pages):
+
+- `Content-Security-Policy`:
+  - `default-src 'self'`;
+  - `script-src 'self' https://static.cloudflareinsights.com` (the Web Analytics beacon);
+  - `style-src 'self' 'unsafe-inline'` (Astro inlines the page CSS);
+  - `font-src 'self'`; `img-src 'self' data:`;
+  - `connect-src 'self' https:` (the checker reads any site's robots.txt and llms.txt, and the forms post to Kit);
+  - `form-action https://app.kit.com`; `frame-src https://www.youtube-nocookie.com`;
+  - `worker-src 'self'`; `frame-ancestors 'none'`; `base-uri 'none'`; `object-src 'none'`.
+- `Strict-Transport-Security: max-age=31536000; includeSubDomains`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`.
+- `/_astro/*` is served with `Cache-Control: public, max-age=31536000, immutable`, since its file names carry content hashes.
+- `https://rastrolog.pages.dev/*` gets `X-Robots-Tag: noindex`, so only `rastrolog.com` is indexed.
+
+The Playwright suite runs every test with this exact CSP added to each response and fails on any violation, so a change that breaks under production headers fails CI, not the live site.
+
+**DNS and domain.** An apex custom domain on Pages must be a Cloudflare zone:
+
+1. `rastrolog.com` becomes a free zone in the maintainer's Cloudflare account. The registrar stays Porkbun; only the nameservers change.
+2. The zone recreates Porkbun's email records before the switch: MX `fwd1.porkbun.com` (priority 10) and `fwd2.porkbun.com` (priority 20), and TXT `v=spf1 include:_spf.porkbun.com ~all`.
+3. It drops the parking-page records: the `ALIAS` for the apex, the `*` CNAME, and the two `_acme-challenge` TXT records.
+4. `rastrolog.com` is the Pages custom domain.
+5. `www` is a proxied `A` record to `192.0.2.1`, with a Bulk Redirect (301, keeping path and query) to `https://rastrolog.com`.
+
+**After the switch**, checked from outside:
+
+- `/` and `/es/` return 200 with the headers above, and `www` answers 301;
+- the MX lookup returns Porkbun's forwarders;
+- the Kit form action matches a real form's embed code;
+- Lighthouse passes against the live URL.
 
 ## Error handling summary
 
