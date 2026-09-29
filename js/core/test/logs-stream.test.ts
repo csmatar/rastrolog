@@ -136,6 +136,40 @@ describe("file-level behaviour matches Python", () => {
     });
   });
 
+  it("reads every member even when the first is large (current runtimes stop at a member's end)", async () => {
+    const big = Array.from({ length: 20_000 }, (_, i) => `${LINE.replace("/a", `/p${i}`)}\n`).join(
+      "",
+    );
+    const data = new Uint8Array([
+      ...gzipSync(enc.encode(big)),
+      ...gzipSync(enc.encode(`${LINE.replace("/a", "/z")}\n`)),
+    ]);
+    for (const chunk of [1024, 1_048_576, data.length]) {
+      const r = await parseLogStream(streamOf(data, chunk));
+      expect({ lines: r.lines, records: r.records, truncated: r.truncated }).toEqual({
+        lines: 20_001,
+        records: 20_001,
+        truncated: false,
+      });
+    }
+  });
+
+  it("ignores zero padding after the last member, like Python", async () => {
+    const gz = gzipSync(enc.encode(`${LINE}\n`));
+    expect(await paths(new Uint8Array([...gz, 0, 0, 0, 0, 0, 0, 0, 0]))).toMatchObject({
+      records: 1,
+      truncated: false,
+    });
+  });
+
+  it("marks other trailing bytes as a damaged file, like Python's BadGzipFile", async () => {
+    const gz = gzipSync(enc.encode(`${LINE}\n`));
+    expect(await paths(new Uint8Array([...gz, 0x41, 0x42, 0x43]))).toMatchObject({
+      records: 1,
+      truncated: true,
+    });
+  });
+
   it("reports an unknown format with its first line", async () => {
     await expect(
       parseLogStream(streamOf(bytes("hello world\n", LINE, "\n"), 4)),

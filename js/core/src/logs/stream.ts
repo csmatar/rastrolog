@@ -1,6 +1,7 @@
 // Streamed parse for files: works in a browser Web Worker and in Node.
-// file.stream() -> [DecompressionStream("gzip") when the magic bytes say so]
+// file.stream() -> [gunzipAll (every member) when the magic bytes say so]
 //   -> TextDecoderStream (BOM kept) -> LineSplitter -> LogSession.
+import { gunzipAll } from "./gunzip.js";
 import { LineSplitter, LogSession, type ParseOptions, type ParseResult } from "./session.js";
 
 export interface StreamOptions extends ParseOptions {
@@ -71,7 +72,7 @@ export async function parseLogStream(
     },
   });
 
-  const bytes = gzip ? counted.pipeThrough(new DecompressionStream("gzip")) : counted;
+  const bytes = gzip ? gunzipAll(counted) : counted;
   const text = bytes.pipeThrough(new TextDecoderStream("utf-8", { ignoreBOM: true })).getReader();
   try {
     for (;;) {
