@@ -86,6 +86,12 @@ def _referrer_index() -> dict[str, Match]:
     }
 
 
+@lru_cache(maxsize=1)
+def _max_referrer_labels() -> int:
+    """Label count of the longest listed referrer host (e.g. 3 for notebooklm.google.com)."""
+    return max(host.count(".") + 1 for host in _referrer_index())
+
+
 #: Requests can carry arbitrarily long User-Agent/Referer values (or a hostile
 #: client can send one on purpose). Caching those would let the lru caches grow
 #: without bound in a long-running ASGI/Django process, so anything longer than
@@ -143,7 +149,10 @@ def _classify_referrer_impl(url: str, own_host: str | None) -> Match | None:
         return None
     labels = host.split(".")
     index = _referrer_index()
-    for start in range(len(labels) - 1):
+    # Only suffixes with at most as many labels as the longest listed host can
+    # match; starting there keeps a hostile many-label host linear, not quadratic.
+    first = max(0, len(labels) - _max_referrer_labels())
+    for start in range(first, len(labels) - 1):
         match = index.get(".".join(labels[start:]))
         if match is not None:
             return match

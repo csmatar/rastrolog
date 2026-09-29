@@ -15,6 +15,12 @@ under **Signals** so they're easy to scan when updating robots.txt.
   - an ESM `classifyReferrer` / `classifyUserAgent` that passes the same conformance suite as the Python package.
 - Conformance: referrer fixtures that pin Python's `urlsplit` behaviour where a WHATWG URL parser disagrees (`https:chatgpt.com`, out-of-range ports, backslash before `@`, whitespace and tabs).
 
+## [0.1.2] - 2026-09-29
+
+### Security
+
+- `classify_referrer` (and so the ASGI/Django middleware and `rastrolog parse`) did quadratic work on a referrer whose host has many dot-separated labels, so a crafted `Referer` header could cost tens to hundreds of milliseconds of CPU per request. It now checks only the host suffixes that can match a listed referrer, which is linear and gives identical results ([GHSA-j9gx-mm38-pr3j](https://github.com/csmatar/rastrolog/security/advisories/GHSA-j9gx-mm38-pr3j)).
+
 ### Fixed
 
 - CloudFront: an encoded `%3F` or `%23` in `cs-uri-stem` is now kept as part of the path (`/a%3Fb` counts as `/a?b`) instead of truncating it; the stem is cut before it's percent-decoded, not after (#6).
