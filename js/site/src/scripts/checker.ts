@@ -8,7 +8,7 @@ import {
   parseRobots,
 } from "@rastrolog/core";
 import { fmt, fmtParts, plural } from "../i18n/format.ts";
-import { readCheckParam, reportUrl, siteOf } from "../lib/check-param.ts";
+import { readCheckParam, reportUrl, siteOf, stripScheme } from "../lib/check-param.ts";
 import {
   countVerdicts,
   type FileMark,
@@ -180,6 +180,17 @@ function askForPaste(outcome: FileOutcome): void {
   status.textContent = message;
   reveal(section);
 }
+
+// Paste, autofill or typing: drop a leading scheme the field already shows, and keep
+// the caret where it was.
+input.addEventListener("input", () => {
+  const value = stripScheme(input.value);
+  const removed = input.value.length - value.length;
+  if (removed === 0) return;
+  const caret = Math.max(0, (input.selectionStart ?? input.value.length) - removed);
+  input.value = value;
+  input.setSelectionRange(caret, caret);
+});
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();

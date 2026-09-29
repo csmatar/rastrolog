@@ -7,6 +7,11 @@ export function siteOf(origin: string): string {
   return origin.replace(/^https:\/\//, "");
 }
 
+/** The domain field already shows "https://", so a pasted "https://dev.to/" becomes "dev.to/". */
+export function stripScheme(value: string): string {
+  return value.replace(/^\s*https?:\/\//i, "");
+}
+
 export function readCheckParam(search: string): string | null {
   const raw = new URLSearchParams(search).get("check");
   if (raw === null) return null;

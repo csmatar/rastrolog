@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readCheckParam, reportUrl, siteOf } from "../src/lib/check-param.ts";
+import { readCheckParam, reportUrl, siteOf, stripScheme } from "../src/lib/check-param.ts";
 
 describe("?check=", () => {
   it.each([
@@ -22,5 +22,20 @@ describe("?check=", () => {
 
   it("siteOf drops the scheme and keeps a port", () => {
     expect(siteOf("https://example.com:8443")).toBe("example.com:8443");
+  });
+});
+
+describe("stripScheme: the field already shows https://, so a pasted one goes", () => {
+  it.each([
+    ["https://dev.to/", "dev.to/"],
+    ["http://example.com/pricing?x=1", "example.com/pricing?x=1"],
+    ["HTTPS://Example.com", "Example.com"],
+    ["  https://example.com", "example.com"],
+    ["example.com", "example.com"],
+    ["example.com/?next=https://x.test", "example.com/?next=https://x.test"],
+    ["https:/", "https:/"],
+    ["ftp://example.com", "ftp://example.com"],
+  ])("%s → %s", (input, expected) => {
+    expect(stripScheme(input)).toBe(expected);
   });
 });

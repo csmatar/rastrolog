@@ -155,6 +155,18 @@ test("?check= runs on load; a local address runs nothing", async ({ page }) => {
   expect(fetched).toEqual([]);
 });
 
+test("a pasted URL loses its scheme, since the field already shows https://", async ({ page }) => {
+  await serveSite(page, "dev.to", { robots: { body: ROBOTS_SAMPLE } });
+  await page.goto("/");
+  const domain = page.locator("#domain");
+  await domain.fill("https://dev.to/");
+  await expect(domain).toHaveValue("dev.to/");
+  expect(await domain.evaluate((el: HTMLInputElement) => el.selectionStart)).toBe(7);
+  await domain.press("Enter");
+  await expect(field(page, "headline")).toContainText("dev.to lets");
+  await expect(domain).toHaveValue("dev.to");
+});
+
 test("bad input keeps focus, with a message tied to the field", async ({ page }) => {
   await page.goto("/");
   await check(page, "192.168.0.1");
