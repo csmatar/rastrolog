@@ -10,7 +10,8 @@
     "typecheck": "pnpm run codegen && tsc -p tsconfig.json",
     "test": "pnpm run codegen && vitest run",
     "e2e": "playwright test",
-    "lhci": "lhci autorun"
+    "lhci": "lhci autorun",
+    "verify-live": "node scripts/verify-live.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",

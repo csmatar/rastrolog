@@ -108,6 +108,7 @@ jobs:
   e2e:
     name: e2e (chromium)
     runs-on: ubuntu-latest
+    timeout-minutes: 15 # the suite takes about a minute; a hang shouldn't hold a runner for 6 hours
     defaults:
       run:
         working-directory: js

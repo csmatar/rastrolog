@@ -32,7 +32,8 @@ export function resolveConfig(env: Readonly<Record<string, string | undefined>>)
     if (release) throw new Error(`${name} must be set for a release build`);
     return fallback;
   };
-  const rawUrl = pick("SITE_URL", DEV.siteUrl);
+  // Pages sets CF_PAGES_URL to each deployment's own URL, so previews link to themselves.
+  const rawUrl = pick("SITE_URL", env.CF_PAGES_URL?.trim() || DEV.siteUrl);
   let siteUrl: string;
   try {
     siteUrl = new URL(rawUrl).origin;

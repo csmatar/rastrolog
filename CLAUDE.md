@@ -50,6 +50,7 @@ pnpm --filter @rastrolog/site run dev            # http://localhost:4321
 pnpm --filter @rastrolog/site run build          # js/site/dist
 pnpm --filter @rastrolog/site run e2e            # Playwright + axe against astro preview (after a build)
 pnpm --filter @rastrolog/site run lhci           # Lighthouse budgets (after a build)
+pnpm --filter @rastrolog/site run verify-live    # checks rastrolog.com: pages, headers, www redirect, MX/SPF
 ```
 
 `js/core/src/*.gen.ts` are generated from `signals.json` by `js/core/scripts/codegen.ts` and gitignored.
@@ -62,6 +63,7 @@ Pre-commit: `cd python && uv run pre-commit install` once; hooks run ruff, mypy,
 - Every third-party action is pinned to a full commit SHA with a `# vX.Y.Z` comment; checkouts use `persist-credentials: false`; each job declares minimal, commented `permissions`. Run `uvx zizmor --persona=pedantic .github/` after touching a workflow; CI enforces it.
 - Dependabot bumps pinned actions, `python/uv.lock` and `js/pnpm-lock.yaml` weekly with a 7-day cooldown. CodeQL (Python, JS/TS and Actions) and OpenSSF Scorecard report to Security → Code scanning.
 - JS supply chain: `pnpm install --frozen-lockfile` in CI, `minimumReleaseAge: 10080` and a build-script allowlist in `js/pnpm-workspace.yaml`. The published package has no runtime dependencies; keep it that way.
+- The site deploys through Cloudflare Pages' Git integration on merge to `main` (settings and the launch checklist are in `js/site/README.md`). GitHub holds no Cloudflare credentials; don't add a deploy token or deploy step to any workflow.
 - Vulnerabilities are reported privately (SECURITY.md); never discuss an unfixed vulnerability in a public issue or PR.
 
 ## Releasing

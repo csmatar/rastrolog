@@ -32,4 +32,28 @@ describe("resolveConfig", () => {
       "SITE_URL is not a URL: not a url",
     );
   });
+
+  it("a preview build without SITE_URL uses the deployment URL Pages provides (Review Focus 4)", () => {
+    expect(resolveConfig({ CF_PAGES_URL: "https://4f2a.rastrolog.pages.dev" }).siteUrl).toBe(
+      "https://4f2a.rastrolog.pages.dev",
+    );
+  });
+
+  it("SITE_URL wins over CF_PAGES_URL", () => {
+    const env = {
+      SITE_URL: "https://rastrolog.com",
+      CF_PAGES_URL: "https://4f2a.rastrolog.pages.dev",
+    };
+    expect(resolveConfig(env).siteUrl).toBe("https://rastrolog.com");
+  });
+
+  it("a release build still needs SITE_URL itself", () => {
+    const env = {
+      RASTROLOG_SITE_RELEASE: "1",
+      CF_PAGES_URL: "https://rastrolog.pages.dev",
+      KIT_FORM_GENERAL: "1",
+      KIT_FORM_LATAM: "2",
+    };
+    expect(() => resolveConfig(env)).toThrow("SITE_URL must be set for a release build");
+  });
 });

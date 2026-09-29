@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures.ts";
 import { COUNTS } from "./helpers.ts";
 
 test("English hero, stats and language link", async ({ page }) => {

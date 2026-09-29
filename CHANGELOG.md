@@ -13,6 +13,7 @@ under **Signals** so they're easy to scan when updating robots.txt.
   - a robots.txt checker covering every crawler in `signals.json`;
   - a log analyzer that reads nginx, Apache, CloudFront and ALB logs, plain or gzipped, in the browser;
   - an email ask after each result (#3).
+- The landing page deploys to https://rastrolog.com through Cloudflare Pages, with a strict Content-Security-Policy that the e2e suite enforces.
 - Conformance: `conformance/log_lines.json` pins line-level log parsing (CLF offsets and invalid dates, escapes, CloudFront headers, absolute request targets, percent-decoding) so the TypeScript log parser is held to the same behaviour as Python.
 
 ## [0.2.1] - 2026-09-29
