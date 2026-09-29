@@ -38,5 +38,7 @@
   { "referrer": "https://chat\tgpt.com/", "expect": { "id": "chatgpt" }, "note": "tab, CR and LF are deleted anywhere in the URL (urlsplit and WHATWG URL agree)" },
   { "referrer": "//chatgpt.com/", "expect": null, "note": "scheme-relative: no scheme" },
   { "referrer": "android-app://com.google.android.gm/", "expect": null, "note": "any scheme is accepted, but this host isn't listed" },
+  { "referrer": "https://a.b.c.d.e.f.g.h.i.j.notebooklm.google.com/", "expect": { "id": "notebooklm" }, "note": "many labels in front of the longest listed host still match (see the linear-time rule in conformance/README.md)" },
+  { "referrer": "https://a.b.c.d.e.f.g.h.i.j.google.com/", "expect": null, "note": "google.com itself isn't listed, only some of its subdomains" },
   { "referrer": "", "expect": null }
 ]

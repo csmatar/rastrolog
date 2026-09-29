@@ -7,6 +7,18 @@ export interface ReferrerOptions {
   ownHost?: string | null | undefined;
 }
 
+let maxLabels = 0;
+
+/** Label count of the longest listed host (e.g. 3 for notebooklm.google.com). */
+function maxReferrerLabels(): number {
+  if (maxLabels === 0) {
+    for (const row of REFERRERS) {
+      for (const host of row[4]) maxLabels = Math.max(maxLabels, host.split(".").length);
+    }
+  }
+  return maxLabels;
+}
+
 function toMatch([id, vendor, vendorName, product]: ReferrerRow): Match {
   return { kind: "referral", id, vendor, vendorName, product, aiSpecific: true };
 }
@@ -23,7 +35,13 @@ export function classifyReferrer(
   const host = normalizeHost(hostname);
   if (options.ownHost && host === normalizeHost(options.ownHost)) return null;
   const labels = host.split(".");
-  for (let start = 0; start < labels.length - 1; start++) {
+  // Only suffixes with at most as many labels as the longest listed host can match;
+  // starting there keeps a hostile many-label host linear, not quadratic.
+  for (
+    let start = Math.max(0, labels.length - maxReferrerLabels());
+    start < labels.length - 1;
+    start++
+  ) {
     const candidate = labels.slice(start).join(".");
     const row = REFERRERS.find((r) => r[4].includes(candidate));
     if (row) return toMatch(row);

@@ -53,3 +53,14 @@ describe("ownHost", () => {
     );
   });
 });
+
+describe("hostile input", () => {
+  // Only suffixes as long as the longest listed host can match; a Referer host with
+  // thousands of labels must not cost quadratic time (GHSA-j9gx-mm38-pr3j).
+  it("classifies a many-label host in linear time", () => {
+    const url = `https://${"a.".repeat(20_000)}com/`;
+    const started = performance.now();
+    expect(classifyReferrer(url)).toBeNull();
+    expect(performance.now() - started).toBeLessThan(50);
+  });
+});

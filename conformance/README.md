@@ -83,6 +83,11 @@ not by these fixtures.
    passes only because of the `www.` stripping on both sides.
 4. Otherwise the host matches a listed referrer host exactly or as any
    subdomain of it (`a.b.chatgpt.com` matches `chatgpt.com`).
+5. Classification must stay linear in the input length. Only a host suffix with
+   at most as many labels as the longest listed host (3, for
+   `notebooklm.google.com`) can match, so implementations check just those
+   suffixes, longest first. Checking every suffix of a host with thousands of
+   labels is quadratic ([GHSA-j9gx-mm38-pr3j](https://github.com/csmatar/rastrolog/security/advisories/GHSA-j9gx-mm38-pr3j)).
 
 ## The report JSON schema
 
