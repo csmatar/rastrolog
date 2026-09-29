@@ -255,7 +255,11 @@ port in `js/core/src/logs/` mirrors them.
 - **Known gaps between the ports** (never hit by real logs): Python's `int()`
   accepts non-ASCII digits, and Python 3.11+'s `fromisoformat` accepts more ISO
   forms than ALB or CloudFront ever write. The TypeScript port accepts ASCII
-  digits and the ALB/CloudFront forms only.
+  digits and the ALB/CloudFront forms only. On a truncated gzip, Python keeps
+  every complete line decoded before the damage; the TypeScript port can lose
+  the last few kilobytes of decoded text on runtimes whose `DecompressionStream`
+  discards buffered output when it fails (Node's does). Both mark the result
+  truncated.
 
 ### Golden generation parameters
 
