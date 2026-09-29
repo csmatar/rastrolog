@@ -1,0 +1,11 @@
+packages:
+  - core
+  - snippet
+
+# Supply chain: never resolve a version published less than 7 days ago
+# (minutes; matches Dependabot's 7-day cooldown in .github/dependabot.yml).
+minimumReleaseAge: 10080
+
+# pnpm blocks dependency lifecycle scripts by default; allow only what needs one.
+onlyBuiltDependencies:
+  - esbuild
