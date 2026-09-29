@@ -108,10 +108,15 @@ test("CORS refusal: explain, then check what the visitor pastes", async ({ page 
     .getByRole("button", { name: "Paste llms.txt instead" });
   await expect(toggle).toHaveAttribute("aria-expanded", "false");
   if (test.info().project.name === "desktop") {
-    const again = await report(page)
+    // Both boxes in one read: the report scrolls into view smoothly, so two separate
+    // boundingBox() calls can land on different scroll positions.
+    const link = await report(page)
       .getByRole("link", { name: "Check another site" })
-      .boundingBox();
-    const box = await toggle.boundingBox();
+      .elementHandle();
+    const [again, box] = await toggle.evaluate(
+      (el, other) => [other, el].map((e) => e?.getBoundingClientRect().toJSON() as DOMRect),
+      link,
+    );
     // Same line: the boxes overlap vertically (the button is 44px tall, the link one text line).
     expect(box?.y ?? 0).toBeLessThan((again?.y ?? 0) + (again?.height ?? 0));
     expect((box?.y ?? 0) + (box?.height ?? 0)).toBeGreaterThan(again?.y ?? 0);
