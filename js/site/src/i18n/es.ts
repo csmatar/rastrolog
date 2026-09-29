@@ -270,7 +270,6 @@ export const es: Strings = {
     snippetTitle: "Tus páginas · una etiqueta script, menos de 2 KB",
     snippetBefore: "Envía un evento",
     snippetAfter: "a GA4, Plausible, PostHog, Fathom, Umami, Matomo o Tag Manager.",
-    pinned: "Etiqueta siempre al día y más opciones",
     copy: "Copiar",
     copied: "Copiado",
   },

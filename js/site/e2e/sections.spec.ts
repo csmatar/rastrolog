@@ -13,6 +13,7 @@ test("install commands copy, with a visible Copied state", async ({ page }) => {
   );
   await expect(button).toHaveText("Copy", { timeout: 4000 });
   await expect(page.locator("#install code").last()).toContainText('integrity="sha384-');
+  await expect(page.locator("#install a")).toHaveCount(0);
 });
 
 test("what it detects: every crawler token links to its documentation", async ({ page }) => {

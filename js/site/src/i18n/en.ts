@@ -238,7 +238,6 @@ export const en = {
     snippetTitle: "Your pages · one script tag, under 2 KB",
     snippetBefore: "Sends one",
     snippetAfter: "event to GA4, Plausible, PostHog, Fathom, Umami, Matomo or Tag Manager.",
-    pinned: "Always-latest tag and more options",
     copy: "Copy",
     copied: "Copied",
   },
