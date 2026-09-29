@@ -43,7 +43,9 @@ A script tag that sends an `ai_referral` event to the analytics you already run 
 Pinned, with Subresource Integrity:
 
 <!-- rastrolog:sri:start -->
-The pinned tag with its `integrity` hash is written here when the first npm release (0.2.0) is published.
+```html
+<script src="https://cdn.jsdelivr.net/npm/rastrolog@0.2.0/dist/snippet.min.js" integrity="sha384-f1WmE4FFMG3T7OCN/djpfKWMNHW3DxGQ3dICa4ZZlIlqLgLnzr4Yzfs0SFK0Wzdm" crossorigin="anonymous" defer></script>
+```
 <!-- rastrolog:sri:end -->
 
 See [`js/snippet/README.md`](js/snippet/README.md) for what each analytics tool receives, `window.aiTraffic`, and the `rastrolog:match` event.

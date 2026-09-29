@@ -7,6 +7,8 @@ under **Signals** so they're easy to scan when updating robots.txt.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-29
+
 ### Added
 
 - npm package `rastrolog` (#2):
