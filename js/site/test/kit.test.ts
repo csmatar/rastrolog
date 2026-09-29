@@ -21,6 +21,24 @@ describe("Kit forms", () => {
     expect(String(seen?.init.body)).toBe("email_address=ana%40example.org");
   });
 
+  it("reads Kit's JSON status, not just the HTTP status", async () => {
+    const body = new URLSearchParams({ email_address: "a@b.co" });
+    const json =
+      (payload: unknown): FetchLike =>
+      async () =>
+        new Response(JSON.stringify(payload), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+    expect(
+      await submitToKit("https://x.example", body, json({ status: "failed", errors: ["invalid"] })),
+    ).toBe("error");
+    expect(await submitToKit("https://x.example", body, json({ status: "success" }))).toBe("ok");
+    const html: FetchLike = async () =>
+      new Response("<p>ok</p>", { status: 200, headers: { "content-type": "text/html" } });
+    expect(await submitToKit("https://x.example", body, html)).toBe("ok");
+  });
+
   it("any failure is an error the form can retry", async () => {
     const body = new URLSearchParams({ email_address: "a@b.co" });
     expect(

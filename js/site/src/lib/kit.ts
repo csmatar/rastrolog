@@ -24,7 +24,11 @@ export async function submitToKit(
       credentials: "omit",
       headers: { Accept: "application/json" },
     });
-    return res.ok ? "ok" : "error";
+    if (!res.ok) return "error";
+    // Kit's embed code reads {"status": "success" | "failed"}; a 200 can still be a failure.
+    if (!(res.headers.get("content-type") ?? "").includes("json")) return "ok";
+    const payload: unknown = await res.json();
+    return (payload as { status?: unknown } | null)?.status === "failed" ? "error" : "ok";
   } catch {
     return "error";
   }
