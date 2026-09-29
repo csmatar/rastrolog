@@ -76,8 +76,8 @@ Production only: `SITE_URL=https://rastrolog.com`, `KIT_FORM_GENERAL`, `KIT_FORM
 
 ### Launch checklist (once)
 
-1. **Kit.** Do the "Kit setup" above: two forms, the `checked_domain` field, and the report link in both confirmation emails. Note both form IDs. The production build fails without them.
-2. **Cloudflare zone.** In Cloudflare, add the site `rastrolog.com` on the Free plan. Before switching nameservers, make the zone's DNS match these records exactly:
+1. **Kit.** Do the "Kit setup" above: two forms, the `checked_domain` field, and the report link in both confirmation emails. Note both form IDs. The production build fails without them. In each form's settings, leave **After subscribing** on Kit's own success message, with no redirect URL: the CSP's `form-action` allows only `app.kit.com`, and Chrome also checks the redirect that follows a form post, so a redirect back to this site would be blocked for visitors without JavaScript.
+2. **Cloudflare zone.** In Cloudflare, add the site `rastrolog.com` on the Free plan. If it asks how to treat AI crawlers, choose the option that allows all crawlers. Leave managed robots.txt and Bot Fight Mode off: crawlers must see this site's own `robots.txt`, which the checker also reports on, and Bot Fight Mode injects an inline script the CSP blocks. Before switching nameservers, make the zone's DNS match these records exactly:
 
    | Type | Name | Content | Proxy |
    | --- | --- | --- | --- |
@@ -93,3 +93,4 @@ Production only: `SITE_URL=https://rastrolog.com`, `KIT_FORM_GENERAL`, `KIT_FORM
 6. **www redirect.** Under Rules, create a Bulk Redirect list with one entry: `www.rastrolog.com` to `https://rastrolog.com`, status 301, with preserve query string, subpath matching, preserve path suffix and include subdomains all on. Enable a Bulk Redirect rule that uses the list.
 7. **Web Analytics.** In the project's Metrics, enable Web Analytics.
 8. **Check.** From `js/`, run `pnpm --filter @rastrolog/site run verify-live`. Every line should read `ok`.
+9. **No-JavaScript signup.** In Chrome with JavaScript disabled, open https://rastrolog.com, submit the email band, and confirm Kit's success page loads and the console shows no Content Security Policy error.
