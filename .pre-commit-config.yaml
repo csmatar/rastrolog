@@ -6,8 +6,10 @@ repos:
       - id: check-yaml
       - id: check-toml
       - id: end-of-file-fixer
+        exclude: ^js/core/test/fixtures/robots/.*\.txt$ # real robots.txt snapshots, kept byte for byte
       - id: trailing-whitespace
         args: [--markdown-linebreak-ext=md]
+        exclude: ^js/core/test/fixtures/robots/.*\.txt$
       - id: check-merge-conflict
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.16.9
