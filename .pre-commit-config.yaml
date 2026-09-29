@@ -32,3 +32,15 @@ repos:
         language: system
         pass_filenames: false
         files: ^python/src/
+      - id: biome
+        name: biome (js/)
+        entry: pnpm --dir js run lint
+        language: system
+        pass_filenames: false
+        files: ^js/
+      - id: tsc
+        name: tsc (js/)
+        entry: pnpm --dir js run typecheck
+        language: system
+        pass_filenames: false
+        files: ^(js/|signals\.json$)

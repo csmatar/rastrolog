@@ -4,7 +4,9 @@
 #   manual bump and re-verification (zizmor + CI), not an automatic PR.
 # - uv: dev/test dependencies in python/uv.lock. Runtime deps are only rich and
 #   typer with lower bounds, so users are unaffected by lock bumps.
-# Both ecosystems wait 7 days after a release before proposing it (cooldown),
+# - npm: dev dependencies in js/pnpm-lock.yaml (the published package has no
+#   runtime deps).
+# Every ecosystem waits 7 days after a release before proposing it (cooldown),
 # so a compromised release is usually caught and yanked before it reaches us.
 version: 2
 updates:
@@ -32,6 +34,19 @@ updates:
       prefix: "chore(deps)"
     groups:
       python-dev:
+        patterns: ["*"]
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
+
+  - package-ecosystem: "npm"
+    directory: "/js"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      js-dev:
         patterns: ["*"]
     open-pull-requests-limit: 5
     cooldown:

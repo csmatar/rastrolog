@@ -31,13 +31,28 @@ uv run rastrolog parse ../conformance/logs/nginx.log
 uv build                      # sdist + wheel (bundles ../signals.json)
 ```
 
+JS (run from `js/`; Node 24, pnpm from `packageManager`):
+
+```bash
+pnpm install                                 # respects minimumReleaseAge (7 days)
+pnpm run lint && pnpm run typecheck          # biome + tsc (codegen runs first)
+pnpm run test                                # vitest, including the TS conformance suite
+pnpm run build                               # js/snippet/dist: snippet.min.js, index.js, types
+pnpm --filter rastrolog run test:bundle      # forbidden network APIs + published types
+pnpm --filter rastrolog run size             # ≤ 2 KB gzipped
+pnpm --filter rastrolog run e2e              # Playwright (needs a build and `playwright install chromium`)
+```
+
+`js/core/src/*.gen.ts` are generated from `signals.json` by `js/core/scripts/codegen.ts` and gitignored.
+
 Pre-commit: `cd python && uv run pre-commit install` once; hooks run ruff, mypy, JSON/YAML checks, and the signals.json schema check.
 
 ## Repository workflow and security
 
-- `main` is protected by the `protect-main` ruleset: changes land only through a PR, squash-merged, with a code-owner approval and green required checks (CI matrix, wheel checks, CodeQL, zizmor). Work on a branch; never push to `main`.
+- `main` is protected by the `protect-main` ruleset: changes land only through a PR, squash-merged, with a code-owner approval and green required checks (CI matrix, wheel checks, JS and e2e, CodeQL, zizmor). Work on a branch; never push to `main`.
 - Every third-party action is pinned to a full commit SHA with a `# vX.Y.Z` comment; checkouts use `persist-credentials: false`; each job declares minimal, commented `permissions`. Run `uvx zizmor --persona=pedantic .github/` after touching a workflow; CI enforces it.
-- Dependabot bumps pinned actions and `python/uv.lock` weekly with a 7-day cooldown. CodeQL (Python + Actions) and OpenSSF Scorecard report to Security → Code scanning.
+- Dependabot bumps pinned actions, `python/uv.lock` and `js/pnpm-lock.yaml` weekly with a 7-day cooldown. CodeQL (Python, JS/TS and Actions) and OpenSSF Scorecard report to Security → Code scanning.
+- JS supply chain: `pnpm install --frozen-lockfile` in CI, `minimumReleaseAge: 10080` and a build-script allowlist in `js/pnpm-workspace.yaml`. The published package has no runtime dependencies; keep it that way.
 - Vulnerabilities are reported privately (SECURITY.md); never discuss an unfixed vulnerability in a public issue or PR.
 
 ## Releasing
