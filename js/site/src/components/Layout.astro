@@ -34,8 +34,8 @@ const ogLocale = lang === "es" ? "es_MX" : "en_US";
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content={ogLocale} />
-    <Font cssVariable="--font-jetbrains-mono" />
-    <Font cssVariable="--font-plex-sans" />
+    <Font cssVariable="--font-jetbrains-mono" preload />
+    <Font cssVariable="--font-plex-sans" preload />
     <script is:inline src={snippetUrl} defer></script>
   </head>
   <body class="bg-bg font-sans text-ink antialiased">

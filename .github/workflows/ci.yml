@@ -151,4 +151,4 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter rastrolog run build
       - run: pnpm --filter @rastrolog/site run build
-      - run: pnpm --filter @rastrolog/site run lhci # Performance ≥ 99, Accessibility 100, Best Practices ≥ 95, SEO 100 (lighthouserc.json)
+      - run: pnpm --filter @rastrolog/site run lhci # Performance ≥ 98, Accessibility 100, Best Practices ≥ 95, SEO 100 (lighthouserc.json)
