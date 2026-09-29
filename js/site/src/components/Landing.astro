@@ -3,9 +3,13 @@ import { clientJson } from "../i18n/client.ts";
 import { fmt } from "../i18n/format.ts";
 import { type Lang, strings } from "../i18n/index.ts";
 import { chatCount } from "../lib/signals.ts";
+import Detects from "./Detects.astro";
+import Footer from "./Footer.astro";
 import Header from "./Header.astro";
 import Hero from "./Hero.astro";
+import Install from "./Install.astro";
 import Layout from "./Layout.astro";
+import Media from "./Media.astro";
 import Stats from "./Stats.astro";
 
 interface Props {
@@ -23,6 +27,10 @@ const t = strings(lang);
       <Hero lang={lang} />
     </div>
     <Stats lang={lang} />
+    <Install lang={lang} />
+    <Detects lang={lang} />
+    <Media lang={lang} />
   </main>
+  <Footer lang={lang} />
   <script is:inline type="application/json" id="rl-strings" set:html={clientJson(lang)}></script>
 </Layout>
