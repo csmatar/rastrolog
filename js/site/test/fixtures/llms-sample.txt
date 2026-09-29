@@ -1,0 +1,21 @@
+# Example Docs
+
+> Guides and API reference for Example.
+
+## Guides
+- [Start here](https://example.com/start.md)
+- [Install](https://example.com/install.md)
+- [Configure](https://example.com/configure.md)
+- [Deploy](https://example.com/deploy.md)
+
+## API
+- [Authentication](https://example.com/api/auth.md)
+- [Users](https://example.com/api/users.md)
+- [Projects](https://example.com/api/projects.md)
+- [Billing](https://example.com/api/billing.md)
+- [Webhooks](https://example.com/api/webhooks.md)
+
+## Optional
+- [Changelog](https://example.com/changelog.md)
+- [Status](https://status.example.com)
+- [Support](https://example.com/support.md)
