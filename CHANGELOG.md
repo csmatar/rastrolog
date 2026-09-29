@@ -7,6 +7,10 @@ under **Signals** so they're easy to scan when updating robots.txt.
 
 ## [Unreleased]
 
+### Added
+
+- Conformance: `conformance/log_lines.json` pins line-level log parsing (CLF offsets and invalid dates, escapes, CloudFront headers, absolute request targets, percent-decoding) so the TypeScript log parser is held to the same behaviour as Python.
+
 ## [0.2.1] - 2026-09-29
 
 ### Fixed

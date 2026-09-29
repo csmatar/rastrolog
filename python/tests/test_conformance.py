@@ -1,9 +1,10 @@
 from typing import Any
 
 import pytest
-from helpers import REFERRER_CASES, UA_CASES
+from helpers import CONFORMANCE, REFERRER_CASES, UA_CASES, load_json
 
 from rastrolog import classify_referrer, classify_user_agent
+from rastrolog.formats import MalformedLineError, make_parser
 from rastrolog.signals import load_signals
 
 POSITIVE_KINDS = {"vendor", "observed", "synthetic", "token"}
@@ -58,3 +59,35 @@ def test_user_agent_fixture_classifies_as_expected(case: dict[str, Any]) -> None
 def test_referrer_fixture_classifies_as_expected(case: dict[str, Any]) -> None:
     match = classify_referrer(case["referrer"], own_host=case.get("own_host"))
     assert (match.id if match else None) == _expected_id(case)
+
+
+LINE_CASES: list[dict[str, Any]] = load_json(CONFORMANCE / "log_lines.json")
+
+
+def _run_line_case(case: dict[str, Any]) -> list[Any]:
+    parser = make_parser(case["format"])
+    got: list[Any] = []
+    for line in case["lines"]:
+        try:
+            record = parser.parse(line)
+        except MalformedLineError:
+            got.append("malformed")
+            continue
+        if record is None:
+            got.append("ignored")
+        else:
+            got.append(
+                {
+                    "ts": record.ts.replace(microsecond=0).isoformat(),
+                    "path": record.path,
+                    "status": record.status,
+                    "ua": record.ua,
+                    "referrer": record.referrer,
+                }
+            )
+    return got
+
+
+@pytest.mark.parametrize("case", LINE_CASES, ids=lambda c: c["name"])
+def test_log_line_fixture_parses_as_expected(case: dict[str, Any]) -> None:
+    assert _run_line_case(case) == case["expect"]

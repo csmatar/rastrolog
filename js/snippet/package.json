@@ -46,7 +46,7 @@
     "typecheck": "pnpm run codegen && tsc -p tsconfig.json",
     "test": "pnpm run codegen && vitest run",
     "build": "pnpm run codegen && node scripts/build.ts && tsc -p ../core/tsconfig.build.json --outDir dist/core",
-    "test:bundle": "vitest run --config vitest.bundle.config.ts && tsc -p test/consumer/tsconfig.json",
+    "test:bundle": "vitest run --config vitest.bundle.config.ts && tsc -p test/consumer/tsconfig.json && tsc -p test/consumer-nodom/tsconfig.json",
     "size": "size-limit",
     "sri": "node scripts/sri.ts",
     "e2e": "playwright test"

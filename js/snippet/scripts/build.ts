@@ -32,8 +32,8 @@ await build({
 writeFileSync(
   at("dist/index.d.ts"),
   [
-    'export { classifyReferrer, classifyUserAgent } from "./core/index.js";',
-    'export type { Match, Purpose, ReferrerOptions } from "./core/index.js";',
+    'export { classifyReferrer, classifyUserAgent } from "./core/classify.js";',
+    'export type { Match, Purpose, ReferrerOptions } from "./core/classify.js";',
     "",
   ].join("\n"),
 );

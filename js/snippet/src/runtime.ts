@@ -1,6 +1,6 @@
 // Imported by path: js/core is private and never published, so the npm
 // manifest must not depend on it (esbuild bundles it; core has sideEffects: false).
-import { classifyReferrer } from "../../core/src/index.js";
+import { classifyReferrer } from "../../core/src/classify.js";
 import { type AiTraffic, type AnalyticsWindow, dispatch } from "./dispatch.js";
 
 export const STORAGE_KEY = "rastrolog";
