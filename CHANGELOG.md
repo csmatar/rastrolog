@@ -7,6 +7,12 @@ under **Signals** so they're easy to scan when updating robots.txt.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-09-29
+
+### Fixed
+
+- Release: publish the npm tarball by its `./` path. npm read `npm-dist/rastrolog-0.2.0.tgz` as a GitHub `owner/repo` shorthand, so 0.2.0 reached PyPI but not npm. 0.2.1 is the first npm release and has the same code as 0.2.0.
+
 ## [0.2.0] - 2026-09-29
 
 ### Added
