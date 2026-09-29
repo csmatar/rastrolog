@@ -20,7 +20,8 @@ export interface AnalyticsWindow {
   };
   fathom?: { trackEvent?: (name: string) => void };
   umami?: { track?: (event: string, data?: Props) => void };
-  _paq?: unknown[];
+  /** An array until matomo.js loads, then Matomo's `{ push }` TrackerProxy. */
+  _paq?: unknown[] | { push?: (command: unknown[]) => unknown };
   dataLayer?: unknown[];
 }
 
@@ -65,9 +66,12 @@ const umami: Dispatcher = (w, source) => {
   return true;
 };
 
+// Detect by `push`, not Array.isArray: matomo.js replaces the _paq array with a
+// TrackerProxy object when it loads, which has happened by the time we dispatch.
 const matomo: Dispatcher = (w, source) => {
-  if (!Array.isArray(w._paq)) return false;
-  w._paq.push(["trackEvent", "AI Referral", source]);
+  const paq = w._paq;
+  if (typeof paq?.push !== "function") return false;
+  paq.push(["trackEvent", "AI Referral", source]);
   return true;
 };
 

@@ -79,7 +79,7 @@ The log parser and robots.txt parser are added to `js/core` in Epic 3.
 | 3 | PostHog | `typeof posthog?.capture === "function"` | `posthog.capture("ai_referral",{source})` then `posthog.setPersonProperties?.({ai_last_source})` | None |
 | 4 | Fathom | `typeof fathom?.trackEvent === "function"` | `fathom.trackEvent("AI Referral - <source>")` (Fathom events carry no properties, so the source goes in the name) | None |
 | 5 | Umami | `typeof umami?.track === "function"` | `umami.track("ai_referral",{source})` | None |
-| 6 | Matomo | `Array.isArray(_paq)` | `_paq.push(["trackEvent","AI Referral",source])` | None |
+| 6 | Matomo | `typeof _paq?.push === "function"` (an array before matomo.js loads, its `TrackerProxy` after) | `_paq.push(["trackEvent","AI Referral",source])` | None |
 | 7 | Google Tag Manager only | `Array.isArray(dataLayer)` and no `gtag` | `dataLayer.push({event:"ai_referral",ai_source})` | Add a Custom Event trigger for `ai_referral` and a tag that forwards it |
 
    GA4 uses `ai_source` rather than `source`, because `source` already means the traffic source in GA reports. GTM is last because gtag.js also creates `dataLayer`; a gtag site is handled by row 1.

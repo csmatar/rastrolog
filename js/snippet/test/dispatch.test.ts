@@ -48,6 +48,14 @@ describe("each tool", () => {
     expect(_paq).toEqual([["trackEvent", "AI Referral", "grok"]]);
   });
 
+  it("Matomo is detected after matomo.js replaced _paq with its { push } proxy", () => {
+    // matomo.js swaps the _paq array for a TrackerProxy object once it loads,
+    // which is always the case by the time the snippet dispatches (after load).
+    const push = vi.fn();
+    expect(dispatch({ _paq: { push } }, "grok", false)).toBe(1);
+    expect(push).toHaveBeenCalledWith(["trackEvent", "AI Referral", "grok"]);
+  });
+
   it("GTM-only pushes a dataLayer event", () => {
     const dataLayer: unknown[] = [];
     dispatch({ dataLayer }, "chatgpt", false);
