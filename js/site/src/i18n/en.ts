@@ -146,7 +146,7 @@ export const en = {
     verdicts: { allowed: "allowed", blocked: "blocked", partial: "partial" },
     columns: { verdict: "Verdict", token: "Token", vendor: "Vendor", lines: "Matched lines" },
     noRule: "no rule matches, so it's allowed",
-    cors: "{host} doesn't let other sites read its robots.txt from a browser, so we can't fetch it from here. Open it and paste its contents below; we'll run the same check.",
+    cors: "We couldn't read {host}/robots.txt from your browser. The site may not let other sites read it, or it may be down or too slow. Open it and paste its contents below; we'll run the same check.",
     serverError:
       '{host}/robots.txt answered {status}. Crawlers treat a server error as "blocked everywhere" until it recovers. If you can open the file, paste it below to check the rules themselves.',
     openFile: "Open {url}",

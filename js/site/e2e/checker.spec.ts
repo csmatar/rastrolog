@@ -82,9 +82,7 @@ test("CORS refusal: explain, then check what the visitor pastes", async ({ page 
   await page.goto("/");
   await check(page, "example.com");
   const paste = page.locator("[data-checker-paste]");
-  await expect(paste).toContainText(
-    "example.com doesn't let other sites read its robots.txt from a browser",
-  );
+  await expect(paste).toContainText("We couldn't read example.com/robots.txt from your browser.");
   await expect(
     paste.getByRole("link", { name: "Open https://example.com/robots.txt" }),
   ).toHaveAttribute("href", "https://example.com/robots.txt");

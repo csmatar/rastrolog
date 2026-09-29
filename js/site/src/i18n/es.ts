@@ -171,7 +171,7 @@ export const es: Strings = {
       lines: "Líneas que aplican",
     },
     noRule: "ninguna regla aplica, así que está permitido",
-    cors: "{host} no deja que otros sitios lean su robots.txt desde el navegador, así que no podemos traerlo desde aquí. Ábrelo y pega su contenido abajo; haremos la misma revisión.",
+    cors: "No pudimos leer {host}/robots.txt desde tu navegador. Puede que el sitio no deje que otros sitios lo lean, o que esté caído o lento. Ábrelo y pega su contenido abajo; haremos la misma revisión.",
     serverError:
       "{host}/robots.txt respondió {status}. Ante un error del servidor, los rastreadores asumen que todo está bloqueado hasta que se recupere. Si puedes abrir el archivo, pégalo abajo para revisar sus reglas.",
     openFile: "Abrir {url}",
