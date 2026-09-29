@@ -28,6 +28,15 @@ uv sync                    # creates .venv from uv.lock
 uv run pre-commit install  # ruff, mypy, JSON/YAML and signals.json schema checks on commit
 ```
 
+The TypeScript classifier and the browser snippet live in `js/` (a pnpm workspace). They need
+Node 24; pnpm's version comes from `packageManager` in `js/package.json`:
+
+```sh
+cd js
+pnpm install                                             # refuses packages published < 7 days ago
+pnpm --filter rastrolog exec playwright install chromium # once, for the e2e tests
+```
+
 ## The gate
 
 Everything below must pass before a PR merges (CI runs the same on Python 3.10–3.14):
@@ -37,6 +46,18 @@ cd python
 uv run ruff check . && uv run ruff format --check .
 uv run mypy                                      # strict
 uv run pytest --cov=rastrolog --cov-fail-under=90
+```
+
+For `js/`:
+
+```sh
+cd js
+pnpm run lint && pnpm run typecheck
+pnpm run test                                  # includes the shared conformance suite
+pnpm run build
+pnpm --filter rastrolog run test:bundle        # no network APIs in the snippet; published types resolve
+pnpm --filter rastrolog run size               # the snippet must stay under 2 KB gzipped
+pnpm --filter rastrolog run e2e                # Playwright against stub analytics
 ```
 
 Changing a workflow? Also run `uvx zizmor --persona=pedantic .github/`: CI runs it as a
@@ -49,10 +70,13 @@ required check.
   project classifies where a visit came from, never who made it.
 - **Core stays standard-library only.** `rich` and `typer` are allowed only in `cli.py`,
   `render.py` and `theme.py`.
-- **One contract, two languages.** The Python and (upcoming) TypeScript classifiers must
-  pass the same `conformance/` fixtures. Never special-case one language; if behaviour
-  changes, update the fixtures and regenerate the golden reports
-  (`uv run python scripts/write_golden.py`) and review the diff.
+- **One contract, two languages.** Classifier changes must keep `js/core` and `python/`
+  passing the same `conformance/` fixtures; a new edge case goes into `conformance/` so
+  both languages test it. Never special-case one language; if behaviour changes, update the
+  fixtures and regenerate the golden reports (`uv run python scripts/write_golden.py`) and
+  review the diff.
+- **The snippet stays tiny and dependency-free.** Under 2 KB gzipped, no runtime
+  dependencies, no cookies or `localStorage`, and it must never throw into the host page.
 - **Kept small on purpose.** Hosted dashboards, visitor identification, alerts that
   require storing data, and server-side proxies are out of scope. Use the `on_match`
   callback and the JSON output to build what you need on top.

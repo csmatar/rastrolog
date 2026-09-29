@@ -29,6 +29,7 @@ test-results/
 
 # Generated
 js/core/src/*.gen.ts
+js/snippet/LICENSE
 
 # OS / editors
 .DS_Store

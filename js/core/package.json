@@ -1,0 +1,14 @@
+{
+  "name": "@rastrolog/core",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "codegen": "node scripts/codegen.ts",
+    "typecheck": "node scripts/codegen.ts && tsc -p tsconfig.json",
+    "test": "node scripts/codegen.ts && vitest run"
+  }
+}

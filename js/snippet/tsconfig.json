@@ -1,0 +1,6 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": { "types": ["node"], "allowImportingTsExtensions": true },
+  "include": ["src", "test", "scripts", "bundle", "e2e", "*.config.ts"],
+  "exclude": ["test/consumer"]
+}

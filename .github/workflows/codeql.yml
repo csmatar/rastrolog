@@ -1,7 +1,7 @@
 name: codeql
 
-# Static security analysis (SAST) for the Python package and for the GitHub
-# Actions workflows themselves. Findings appear in Security → Code scanning and
+# Static security analysis (SAST) for the Python package, the JS/TS workspace,
+# and the GitHub Actions workflows themselves. Findings appear in Security → Code scanning and
 # as PR annotations. Complements ruff/mypy (ci.yml) and zizmor (zizmor.yml).
 
 on:
@@ -30,7 +30,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [python, actions]
+        language: [python, actions, javascript-typescript]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

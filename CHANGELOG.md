@@ -7,6 +7,14 @@ under **Signals** so they're easy to scan when updating robots.txt.
 
 ## [Unreleased]
 
+### Added
+
+- npm package `rastrolog` (#2):
+  - a script tag under 2 KB gzipped that sends an `ai_referral` event to GA4, Plausible, PostHog, Fathom, Umami, Matomo or Google Tag Manager;
+  - `window.aiTraffic`, a `data-callback` attribute and a `rastrolog:match` event;
+  - an ESM `classifyReferrer` / `classifyUserAgent` that passes the same conformance suite as the Python package.
+- Conformance: referrer fixtures that pin Python's `urlsplit` behaviour where a WHATWG URL parser disagrees (`https:chatgpt.com`, out-of-range ports, backslash before `@`, whitespace and tabs).
+
 ## [0.1.2] - 2026-09-29
 
 ### Security

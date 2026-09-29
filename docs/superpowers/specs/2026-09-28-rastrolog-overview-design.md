@@ -114,14 +114,14 @@ Known, documented gap: Google AI Overviews and AI Mode send a plain `google.com`
 
 `conformance/` is language-neutral JSON consumed by both test suites:
 
-- `user_agents.json`: `[{ "ua": "<UA string>", "expect": { "id": "openai-gptbot" } | null, "kind": "vendor" | "observed" | "token" | "negative", "source": "<vendor doc URL>" | null, "label"?: "browser-chrome" }]`. `vendor` means the vendor publishes the string verbatim. `observed` means the vendor documents the token but not the full string (Anthropic, for example). `token` means the vendor publishes only the token.
+- `user_agents.json`: `[{ "ua": "<UA string>", "expect": { "id": "openai-gptbot" } | null, "kind": "vendor" | "observed" | "synthetic" | "token" | "negative", "source": "<vendor doc URL>" | null, "label"?: "browser-chrome" }]`. `vendor` means the vendor publishes the string verbatim. `observed` means the vendor documents the token but not the full string (Anthropic, for example). `token` means the vendor publishes only the token. `synthetic` is a hand-made variant that exercises a matching rule (added in #24). `conformance/README.md` is the detailed contract.
 - `referrers.json`: `[{ "referrer": "https://chatgpt.com/", "expect": { "id": "chatgpt" } | null }]`, including negatives (`https://www.google.com/`, same-host, malformed URLs, empty string).
 - `logs/<format>.log` + `logs/<format>.expected.json`: parser + report golden files.
 
 Invariants enforced by tests in **both** languages:
 
 1. `signals.json` validates against `signals.schema.json`.
-2. Every crawler with `match: "user_agent"` has at least one positive fixture in `user_agents.json` that cites the vendor's doc page (`kind` vendor, observed or token).
+2. Every crawler with `match: "user_agent"` has at least one positive fixture in `user_agents.json` that cites the vendor's doc page (`kind` vendor, observed, synthetic or token).
 3. Every referrer entry has at least one positive fixture in `referrers.json`.
 4. Every fixture classifies to its `expect` value.
 
@@ -131,11 +131,11 @@ Invariants enforced by tests in **both** languages:
 | --- | --- |
 | Python env/build | uv; hatchling build backend (can `force-include` root `signals.json` into the wheel) |
 | Python quality | ruff (lint + format), mypy `--strict`, pytest + pytest-cov; CI matrix 3.10–3.14 |
-| JS | Node 24 LTS, pnpm workspaces, TypeScript strict, vitest, esbuild (snippet), size-limit |
+| JS | Node 24 LTS, pnpm workspaces, TypeScript strict, Biome, vitest, esbuild (snippet), size-limit |
 | Site | Astro (static output), Tailwind CSS v4, Playwright, Lighthouse CI, axe |
 | Hooks | pre-commit: ruff, ruff-format, `tsc --noEmit`, signals schema check |
 | CI | `ci.yml`: Python matrix, JS test/typecheck/size, site build + e2e + Lighthouse, conformance in both |
-| Release | `release.yml` on `v*` tag: PyPI via trusted publishing (OIDC), npm via trusted publishing with provenance, site deploy to Cloudflare Pages. One tag publishes everything so versions never drift |
+| Release | `release.yml` on `v*` tag: PyPI via trusted publishing (OIDC), npm via trusted publishing with provenance (the first npm release uses a one-time token; see the Epic 2 spec), site deploy to Cloudflare Pages. One tag publishes everything so versions never drift |
 
 ## Claude Code setup
 

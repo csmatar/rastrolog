@@ -1,0 +1,69 @@
+{
+  "name": "rastrolog",
+  "version": "0.1.2",
+  "description": "Spot visitors from ChatGPT, Claude, Perplexity and other AI chat products, and send them to the analytics you already run. One script tag, under 2 KB.",
+  "keywords": [
+    "ai",
+    "analytics",
+    "referrer",
+    "chatgpt",
+    "perplexity",
+    "claude",
+    "ga4",
+    "plausible",
+    "posthog"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/csmatar/rastrolog#readme",
+  "bugs": "https://github.com/csmatar/rastrolog/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/csmatar/rastrolog.git",
+    "directory": "js/snippet"
+  },
+  "type": "module",
+  "sideEffects": [
+    "./dist/snippet.min.js"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./snippet": "./dist/snippet.min.js",
+    "./package.json": "./package.json"
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "codegen": "node ../core/scripts/codegen.ts",
+    "typecheck": "pnpm run codegen && tsc -p tsconfig.json",
+    "test": "pnpm run codegen && vitest run",
+    "build": "pnpm run codegen && node scripts/build.ts && tsc -p ../core/tsconfig.build.json --outDir dist/core",
+    "test:bundle": "vitest run --config vitest.bundle.config.ts && tsc -p test/consumer/tsconfig.json",
+    "size": "size-limit",
+    "sri": "node scripts/sri.ts",
+    "e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.0",
+    "@size-limit/file": "^14.0.0",
+    "esbuild": "^0.28.0",
+    "happy-dom": "^20.14.3",
+    "size-limit": "^14.0.0"
+  },
+  "size-limit": [
+    {
+      "name": "snippet (gzip)",
+      "path": "dist/snippet.min.js",
+      "limit": "2 KB",
+      "gzip": true
+    }
+  ]
+}
