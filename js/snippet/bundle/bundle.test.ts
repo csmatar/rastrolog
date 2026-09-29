@@ -54,3 +54,13 @@ describe("dist/index.js", () => {
     expect(mod.classifyUserAgent("GPTBot/1.4")?.id).toBe("openai-gptbot");
   });
 });
+
+describe("package.json", () => {
+  // `pnpm pack` must be able to publish it, and a dependency on the unpublished,
+  // unclaimed @rastrolog scope would invite dependency confusion.
+  it("references no workspace or private package", () => {
+    const manifest = read("package.json");
+    expect(manifest).not.toContain("workspace:");
+    expect(manifest).not.toContain("@rastrolog/");
+  });
+});

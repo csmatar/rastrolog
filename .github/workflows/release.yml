@@ -1,9 +1,10 @@
 name: release
 
-# Publishes to PyPI on a v* tag via Trusted Publishing (OIDC): no token is stored.
-# The build job runs tests and builds with read-only rights; only the publish job
-# can mint an OIDC token, and it runs no project code. The `pypi` environment
-# requires a maintainer's approval and only accepts v* tags.
+# Publishes to PyPI and npm on a v* tag via Trusted Publishing (OIDC). The build
+# job runs both test suites and builds both packages with read-only rights; only
+# the publish jobs can mint an OIDC token, and they run no project code. Each
+# publish job waits for a maintainer's approval in its environment (`pypi`,
+# `npm`), and both environments only accept v* tags.
 
 on:
   push:
@@ -48,6 +49,39 @@ jobs:
       - name: Wheel contains signals.json
         working-directory: python
         run: python3 -m zipfile -l dist/*.whl | grep -q "rastrolog/signals.json"
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          package_json_file: js/package.json
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          package-manager-cache: false # no shared cache in the release path (cache-poisoning guard)
+      - name: Tag matches npm package version
+        run: |
+          version="$(node -p "require('./js/snippet/package.json').version")"
+          if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "tag ${GITHUB_REF_NAME} does not match npm package version v${version}"
+            exit 1
+          fi
+      - name: Build and test the JS workspace
+        working-directory: js
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm run typecheck
+          pnpm run test
+          pnpm run build
+          pnpm --filter rastrolog run test:bundle
+          pnpm --filter rastrolog run size
+      - name: Pinned SRI tag in the READMEs matches this build
+        working-directory: js
+        run: pnpm --filter rastrolog run sri --check ../../README.md README.md
+      - name: Pack the npm tarball
+        working-directory: js/snippet
+        run: pnpm pack --pack-destination ../../npm-dist
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: npm-dist
+          path: npm-dist/
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: dist
@@ -70,3 +104,31 @@ jobs:
       - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # v1.14.2
         with:
           packages-dir: dist
+
+  publish-npm:
+    name: publish to npm
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/rastrolog
+    permissions:
+      id-token: write # npm trusted publishing (OIDC) and provenance; nothing else
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: npm-dist
+          path: npm-dist
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24 # bundles npm 11 (trusted publishing needs >= 11.5.1)
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
+      - name: Publish the tarball built by the build job (no project code runs here)
+        env:
+          # First release only (v0.2.0): npm can't set up trusted publishing for a
+          # package that doesn't exist yet, so this one-day token (a secret of the
+          # `npm` environment) is used once. Remove this env block after the trusted
+          # publisher is configured; see CLAUDE.md -> Releasing.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_FIRST_PUBLISH_TOKEN }}
+        run: npm publish npm-dist/rastrolog-*.tgz --provenance --access public --ignore-scripts

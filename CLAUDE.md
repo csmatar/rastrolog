@@ -57,10 +57,24 @@ Pre-commit: `cd python && uv run pre-commit install` once; hooks run ruff, mypy,
 
 ## Releasing
 
-1. Bump `version` in `python/pyproject.toml` and run `cd python && uv lock`.
+1. Bump `version` in `python/pyproject.toml` **and** `js/snippet/package.json` to the same value, then run `cd python && uv lock`.
 2. In `CHANGELOG.md`, rename **Unreleased** to `[x.y.z] - YYYY-MM-DD` and start a new empty **Unreleased**.
-3. Merge the PR to `main`, then tag `vX.Y.Z` on `main` and push the tag (only admins can create `v*` tags). `release.yml` checks that the tag matches the version, runs the tests, builds, and waits for a maintainer to approve the `pypi` deployment before publishing through trusted publishing.
+3. Pin the new snippet in the READMEs: `cd js && pnpm install --frozen-lockfile && pnpm --filter rastrolog run build && pnpm --filter rastrolog run sri --write ../../README.md README.md`.
+4. Merge the PR to `main`, then tag `vX.Y.Z` on `main` and push the tag (only admins can create `v*` tags). `release.yml` does the rest:
+   - checks that the tag matches both versions and the README SRI hash;
+   - runs both test suites and builds both packages;
+   - waits for a maintainer to approve each of the `pypi` and `npm` deployments;
+   - publishes through trusted publishing, with provenance on npm.
 
 Configured (0.1.0 shipped with it): PyPI trusted publisher for owner `csmatar`, repo `rastrolog`, workflow `release.yml`, environment `pypi`; GitHub `pypi` environment with a required reviewer (`@csmatar`) and a `v*` tag rule.
+
+npm (first release, 0.2.0): trusted publishing can only be set up for an existing package. Before tagging v0.2.0:
+1. Create the GitHub `npm` environment (required reviewer `@csmatar`, `v*` tags only).
+2. Store a granular npm token that expires in 1 day as its secret `NPM_FIRST_PUBLISH_TOKEN`.
+
+After v0.2.0 is on npm:
+1. Add the trusted publisher on npmjs.com (repo `csmatar/rastrolog`, workflow `release.yml`, environment `npm`).
+2. Delete the token and the secret, and set the package to disallow token publishing.
+3. Open a PR that removes the `NODE_AUTH_TOKEN` env block from `release.yml`.
 
 Never publish from a laptop. `uv publish`, `npm publish` and `pnpm publish` are denied in `.claude/settings.json`.
