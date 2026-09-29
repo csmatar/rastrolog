@@ -26,10 +26,10 @@ const area = "w-full rounded-btn border border-line bg-code p-3.5 font-mono text
   </div>
 
   <div data-checker-result hidden class="flex flex-col gap-3.5 md:gap-[22px]">
-    <ul class="m-0 flex list-none flex-col gap-1 p-0 font-mono text-[13px] text-muted md:flex-row md:flex-wrap md:items-center md:gap-x-7 md:text-sm">
+    <ul class="m-0 flex list-none flex-col gap-1 self-start p-0 font-mono text-[13px] text-muted md:text-sm">
       <li class="flex gap-2"><span data-f="robots-mark" aria-hidden="true" class="font-bold data-[mark=ok]:text-ok data-[mark=warn]:text-warn"></span><span data-f="robots"></span></li>
       <li class="flex gap-2"><span data-f="llms-mark" aria-hidden="true" class="font-bold data-[mark=ok]:text-ok data-[mark=warn]:text-warn"></span><span data-f="llms"></span></li>
-      <li>{c.checkedAt} · <a href="#top">{c.again}</a><span data-f="llms-paste-item" hidden> · <button type="button" data-f="llms-paste-toggle" aria-expanded="false" aria-controls="llms-paste-panel" class="inline-flex min-h-11 cursor-pointer items-center border-0 bg-transparent p-0 font-mono text-[13px] text-accent md:text-sm underline underline-offset-2 hover:text-accent-hover">{c.llms.pasteSummary}</button></span></li>
+      <li class="mt-1 border-t border-line pt-2">{c.checkedAt} · <a href="#top">{c.again}</a><span data-f="llms-paste-item" hidden> · <button type="button" data-f="llms-paste-toggle" aria-expanded="false" aria-controls="llms-paste-panel" class="inline-flex min-h-11 cursor-pointer items-center border-0 bg-transparent p-0 font-mono text-[13px] text-accent md:text-sm underline underline-offset-2 hover:text-accent-hover">{c.llms.pasteSummary}</button></span></li>
     </ul>
     <div id="llms-paste-panel" data-f="llms-paste" hidden class="flex flex-col gap-2 text-sm">
       <label for="paste-llms" class="font-semibold">{c.llms.pasteLabel}</label>

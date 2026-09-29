@@ -50,6 +50,28 @@ test("found robots.txt and llms.txt: headline, summary, table and a shareable UR
   await expect(page.locator("#domain")).toHaveValue("example.com");
 });
 
+test("the file lines stack as one group, with the meta line under a divider", async ({ page }) => {
+  await serveSite(page, "example.com", {
+    robots: { body: ROBOTS_SAMPLE },
+    llms: { body: LLMS_SAMPLE },
+  });
+  await page.goto("/");
+  await check(page, "example.com");
+  await expect(field(page, "headline")).toBeVisible();
+  const rows = report(page).locator("ul").first().locator(":scope > li");
+  const [robots, llms, meta] = await rows.evaluateAll((els) =>
+    els.map((el) => {
+      const r = el.getBoundingClientRect();
+      return { x: r.x, top: r.top, bottom: r.bottom, border: getComputedStyle(el).borderTopWidth };
+    }),
+  );
+  expect(llms?.x).toBe(robots?.x);
+  expect(meta?.x).toBe(robots?.x);
+  expect((llms?.top ?? 0) - (robots?.bottom ?? 0)).toBeLessThanOrEqual(6);
+  expect((meta?.top ?? 0) - (llms?.bottom ?? 0)).toBeLessThanOrEqual(12);
+  expect(meta?.border).toBe("1px");
+});
+
 test("404: every crawler allowed by default, and no llms.txt", async ({ page }) => {
   await serveSite(page, "example.com", { robots: { status: 404 }, llms: { status: 404 } });
   await page.goto("/");
