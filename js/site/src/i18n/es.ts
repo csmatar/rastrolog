@@ -311,4 +311,10 @@ export const es: Strings = {
     analytics:
       "Sin cookies. Cloudflare Web Analytics cuenta las visitas, y el snippet de rastrolog también corre aquí.",
   },
+  notFound: {
+    title: "Página no encontrada · rastrolog",
+    heading: "Aquí no hay nada",
+    body: "Esa dirección no es una página de rastrolog.com. El verificador de robots.txt y el analizador de logs están en la página principal.",
+    home: "Ir a la página principal",
+  },
 };
