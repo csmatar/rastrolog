@@ -34,3 +34,20 @@ export function hostOf(url: string): string | null {
       : (hostPort.split(":", 1)[0] ?? "");
   return host ? host.toLowerCase() : null;
 }
+
+/**
+ * The path of an absolute URL as urllib.parse.urlsplit(url).path reads it, or
+ * null where urlsplit raises (unbalanced IPv6 brackets).
+ */
+export function urlsplitPath(url: string): string | null {
+  const s = url.replace(/[\t\r\n]/g, "");
+  const scheme = SCHEME.exec(s);
+  let rest = scheme ? s.slice(scheme[0].length) : s;
+  if (rest.startsWith("//")) {
+    const authorityEnd = rest.slice(2).search(/[/?#]/);
+    const netloc = authorityEnd < 0 ? rest.slice(2) : rest.slice(2, 2 + authorityEnd);
+    if (netloc.includes("[") !== netloc.includes("]")) return null;
+    rest = authorityEnd < 0 ? "" : rest.slice(2 + authorityEnd);
+  }
+  return rest.split(/[?#]/, 1)[0] ?? "";
+}
