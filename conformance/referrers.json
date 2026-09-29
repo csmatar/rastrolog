@@ -30,5 +30,13 @@
   { "referrer": "https://chatgpt.com\\@evil.com/", "expect": null, "note": "Python's urlsplit reads the host as evil.com (userinfo before an unescaped '@' is dropped); a WHATWG-compliant URL parser would read chatgpt.com instead. The contract here is null either way -- the TS port must match this behaviour, not resolve the ambiguity differently." },
   { "referrer": "chatgpt.com", "expect": null, "note": "no scheme" },
   { "referrer": "https://chatgpt.com/", "own_host": "www.chatgpt.com", "expect": null, "note": "own_host: never a referral, even though chatgpt.com is otherwise a known AI referrer host" },
+  { "referrer": "https:chatgpt.com", "expect": null, "note": "no '//' authority, so urlsplit finds no host. A WHATWG URL parser reads chatgpt.com here; the TS port must not." },
+  { "referrer": "https://chatgpt.com:99999/", "expect": { "id": "chatgpt" }, "note": "an out-of-range port doesn't stop urlsplit reading the host, while WHATWG URL throws. The TS port must match urlsplit." },
+  { "referrer": "https://evil.com\\@chatgpt.com/", "expect": { "id": "chatgpt" }, "note": "mirror of the chatgpt.com\\@evil.com case: urlsplit takes the host after the last '@'" },
+  { "referrer": "https://user:pw@CHATGPT.com/", "expect": { "id": "chatgpt" }, "note": "userinfo is ignored; the host is lowercased" },
+  { "referrer": "  https://chatgpt.com/\n", "expect": { "id": "chatgpt" }, "note": "surrounding whitespace is stripped" },
+  { "referrer": "https://chat\tgpt.com/", "expect": { "id": "chatgpt" }, "note": "tab, CR and LF are deleted anywhere in the URL (urlsplit and WHATWG URL agree)" },
+  { "referrer": "//chatgpt.com/", "expect": null, "note": "scheme-relative: no scheme" },
+  { "referrer": "android-app://com.google.android.gm/", "expect": null, "note": "any scheme is accepted, but this host isn't listed" },
   { "referrer": "", "expect": null }
 ]
