@@ -35,6 +35,10 @@ test("found robots.txt and llms.txt: headline, summary, table and a shareable UR
   await expect(field(page, "robots-mark")).toHaveText("✓");
   await expect(field(page, "robots-mark")).toHaveCSS("color", "rgb(6, 122, 80)");
   await expect(field(page, "llms-mark")).toHaveText("✓");
+  const badges = field(page, "groups").locator('[data-f="badge"]');
+  await expect(badges.nth(0)).toHaveCSS("background-color", "rgb(242, 93, 148)");
+  await expect(badges.nth(1)).toHaveCSS("background-color", "rgb(4, 181, 117)");
+  await expect(badges.nth(2)).toHaveCSS("background-color", "rgb(106, 69, 224)");
   await expect(field(page, "summary").locator("li").first()).toContainText(
     "OpenAI, Google, Common Crawl, and ByteDance can't collect training data from example.com.",
   );

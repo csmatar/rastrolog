@@ -54,6 +54,13 @@ test("pasted lines: the CLI's numbers, with AI crawlers apart from search engine
   await expect(field(page, "crawler-rows").getByRole("row").first()).toContainText("GPTBot");
   await expect(field(page, "referral-rows").getByRole("row")).toHaveCount(3);
   await expect(field(page, "search-rows")).toContainText("Googlebot");
+  const rows = field(page, "crawler-rows");
+  await expect(
+    rows.getByRole("row", { name: /ChatGPT-User/ }).locator('[data-f="purpose"]'),
+  ).toHaveCSS("background-color", "rgb(4, 181, 117)");
+  await expect(
+    rows.getByRole("row", { name: /PerplexityBot/ }).locator('[data-f="purpose"]'),
+  ).toHaveCSS("background-color", "rgb(106, 69, 224)");
 });
 
 test("a picked file is read without any request leaving the page", async ({ page }) => {

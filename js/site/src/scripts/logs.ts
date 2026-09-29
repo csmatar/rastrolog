@@ -103,7 +103,7 @@ function render(parsed: ParseResult, name: string): void {
       f(row, "vendor").textContent = c.vendorName;
       f(row, "token").textContent = c.token;
       const badge = f(row, "purpose");
-      badge.dataset.purpose = c.purpose;
+      badge.dataset.purpose = c.purpose.replace("_", "-"); // Tailwind reads "_" in data-[…] as a space
       badge.textContent = purposeLabels[c.purpose]?.label ?? c.purpose;
       f(row, "requests").textContent = String(c.requests);
       f(row, "pages").textContent = String(c.pages);

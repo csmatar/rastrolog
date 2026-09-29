@@ -138,7 +138,7 @@ function renderGroups(verdicts: readonly CrawlerVerdict[]): void {
       el.open = wide || index === 0;
       const purpose = t.purposes[group.purpose];
       const badge = f(el, "badge");
-      badge.dataset.purpose = group.purpose;
+      badge.dataset.purpose = group.purpose.replace("_", "-"); // Tailwind reads "_" in data-[…] as a space
       badge.textContent = purpose.label;
       const counts = [
         group.blocked > 0 ? plural(S.lang, group.blocked, t.counts.blocked) : null,
