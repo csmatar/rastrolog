@@ -69,8 +69,9 @@ The log parser and robots.txt parser are added to `js/core` in Epic 3.
 3. On a **match**, store `{source, vendor}` in `sessionStorage["rastrolog"]` and set `window.aiTraffic = { source, vendor, landing: true }`.
    With **no match**, read `sessionStorage["rastrolog"]`. If it's present, set `window.aiTraffic = { ...stored, landing: false }`; otherwise set it to `null`.
    `source` is the referrer id (for example `chatgpt`) and `vendor` is the vendor slug (for example `openai`).
-4. **Only when `landing: true`**, dispatch after the `window` `load` event, or immediately if `document.readyState === "complete"`. By then, `defer` and `async` analytics scripts have run and defined their globals.
-5. Dispatch order (first found wins unless `data-all`). APIs were verified against vendor docs on 2026-09-28:
+4. A reload or back/forward of the landing page (Navigation Timing `type` `reload` / `back_forward`) keeps the referrer but is not a new arrival: it gets `landing: false`.
+5. **Only when `landing: true`**, dispatch after the `window` `load` event, or immediately if `document.readyState === "complete"`. By then, `defer` and `async` analytics scripts have run and defined their globals.
+6. Dispatch order (first found wins unless `data-all`). APIs were verified against vendor docs on 2026-09-28:
 
 | # | Tool | Detected by | Call | Site-owner setup (documented in README) |
 | --- | --- | --- | --- | --- |
@@ -84,7 +85,7 @@ The log parser and robots.txt parser are added to `js/core` in Epic 3.
 
    GA4 uses `ai_source` rather than `source`, because `source` already means the traffic source in GA reports. GTM is last because gtag.js also creates `dataLayer`; a gtag site is handled by row 1.
 
-6. When landing, the snippet also:
+7. When landing, the snippet also:
    - calls `window[data-callback](aiTraffic)` if that is a function;
    - dispatches `window.dispatchEvent(new CustomEvent("rastrolog:match",{detail: aiTraffic}))`.
 

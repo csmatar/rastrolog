@@ -30,7 +30,7 @@ The snippet sends to the first tool it finds on the page, in this order. Add `da
 
 `<source>` is the referrer id from [`signals.json`](https://github.com/csmatar/rastrolog/blob/main/signals.json), for example `chatgpt`, `claude`, `perplexity`, `gemini` or `copilot`.
 
-The event is sent once, on the page the visitor lands on, after the page's `load` event, so analytics scripts loaded with `defer` or `async` are ready.
+The event is sent once per arrival, on the page the visitor lands on, after the page's `load` event, so analytics scripts loaded with `defer` or `async` are ready. Reloading that page doesn't send it again.
 
 ## Use it in your own code
 
@@ -38,7 +38,7 @@ The event is sent once, on the page the visitor lands on, after the page's `load
 window.aiTraffic; // { source: "chatgpt", vendor: "openai", landing: true } or null
 ```
 
-- `landing` is `true` on the landing page and `false` on later pages in the same tab session. The source is kept in `sessionStorage` under the key `rastrolog`.
+- `landing` is `true` only when the visitor has just arrived from the AI product. It is `false` on later pages in the same tab session, and when the landing page is reloaded or revisited with Back/Forward, so the event is never sent twice for one arrival. The source is kept in `sessionStorage` under the key `rastrolog`.
 - `data-callback="myFunction"` calls `window.myFunction(aiTraffic)` on the landing page.
 - The `rastrolog:match` event fires on `window` on the landing page, with `aiTraffic` as `event.detail`:
 

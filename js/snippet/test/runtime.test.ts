@@ -95,6 +95,44 @@ describe("landing from an AI product", () => {
   });
 });
 
+describe("reloads and back/forward", () => {
+  // document.referrer survives a reload, and a back/forward navigation that isn't
+  // served from the bfcache; neither is a new arrival from the AI product.
+  function navigationType(win: SnippetWindow, type: string) {
+    vi.spyOn(win.performance, "getEntriesByType").mockReturnValue([
+      { type } as unknown as PerformanceEntry,
+    ]);
+  }
+
+  it.each(["reload", "back_forward"])("%s of the landing page sends nothing again", (type) => {
+    const win = makeWindow("complete");
+    navigationType(win, type);
+    win.gtag = vi.fn();
+    const seen = vi.fn();
+    win.addEventListener(EVENT_NAME, seen);
+    expect(run(win, CHATGPT)).toEqual({ source: "chatgpt", vendor: "openai", landing: false });
+    expect(win.gtag).not.toHaveBeenCalled();
+    expect(seen).not.toHaveBeenCalled();
+    expect(JSON.parse(win.sessionStorage.getItem(STORAGE_KEY) ?? "null")?.source).toBe("chatgpt");
+  });
+
+  it("a normal navigation is a landing", () => {
+    const win = makeWindow("complete");
+    navigationType(win, "navigate");
+    win.gtag = vi.fn();
+    expect(run(win, CHATGPT)?.landing).toBe(true);
+    expect(win.gtag).toHaveBeenCalled();
+  });
+
+  it("a Performance API that throws still counts the landing", () => {
+    const win = makeWindow("complete");
+    vi.spyOn(win.performance, "getEntriesByType").mockImplementation(() => {
+      throw new Error("unsupported");
+    });
+    expect(run(win, CHATGPT)?.landing).toBe(true);
+  });
+});
+
 describe("later pages in the same session", () => {
   it("carries the source over with landing: false and dispatches nothing", () => {
     const win = makeWindow("complete");

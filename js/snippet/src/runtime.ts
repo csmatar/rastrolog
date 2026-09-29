@@ -46,6 +46,18 @@ function load(win: SnippetWindow): Stored | null {
   return null;
 }
 
+/** Reload and back/forward keep document.referrer, but they aren't a new arrival. */
+function isRevisit(win: SnippetWindow): boolean {
+  try {
+    const type = (
+      win.performance.getEntriesByType("navigation")[0] as { type?: string } | undefined
+    )?.type;
+    return type === "reload" || type === "back_forward";
+  } catch {
+    return false;
+  }
+}
+
 function announce(
   win: SnippetWindow,
   traffic: AiTraffic,
@@ -68,14 +80,15 @@ function announce(
 
 /**
  * Classify this page view, set `window.aiTraffic`, and on an AI landing send the
- * event after `load`. A second copy of the snippet on the same page does nothing.
+ * event after `load`. A reload or back/forward of the landing page is not a new
+ * landing. A second copy of the snippet on the same page does nothing.
  */
 export function start({ win, referrer, hostname, script }: StartInput): AiTraffic | null {
   if (win.aiTraffic !== undefined) return win.aiTraffic;
   const match = classifyReferrer(referrer, { ownHost: hostname });
   let traffic: AiTraffic | null;
   if (match) {
-    traffic = { source: match.id, vendor: match.vendor, landing: true };
+    traffic = { source: match.id, vendor: match.vendor, landing: !isRevisit(win) };
     save(win, traffic);
   } else {
     const stored = load(win);

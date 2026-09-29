@@ -108,3 +108,15 @@ test("data-callback runs before the rastrolog:match event", async ({ page }) => 
     ["event", detail],
   ]);
 });
+
+test("reloading the landing page does not send ai_referral again", async ({ page }) => {
+  await landFrom(page, "https://chatgpt.com", "/ga4.html");
+  await page.waitForFunction(() => ((window as unknown as Recorded).dataLayer?.length ?? 0) >= 2);
+  await page.reload();
+  await page.waitForLoadState("load");
+  expect(await page.evaluate(() => document.referrer)).toBe("https://chatgpt.com/");
+  expect(await aiTraffic(page)).toEqual({ source: "chatgpt", vendor: "openai", landing: false });
+  expect(
+    await page.evaluate(() => (window as unknown as { dataLayer: unknown[] }).dataLayer),
+  ).toEqual([]);
+});
