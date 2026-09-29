@@ -1,0 +1,14 @@
+# Production headers for Cloudflare Pages (spec: Epic 3, Deploy).
+# The e2e suite serves every page under this Content-Security-Policy.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https:; form-action https://app.kit.com; frame-src https://www.youtube-nocookie.com; worker-src 'self'; frame-ancestors 'none'; base-uri 'none'; object-src 'none'
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+https://rastrolog.pages.dev/*
+  X-Robots-Tag: noindex
