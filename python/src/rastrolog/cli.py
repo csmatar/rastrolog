@@ -37,6 +37,9 @@ EXIT_NO_MATCH = 1
 EXIT_USAGE = 2
 
 _URL = re.compile(r"^[A-Za-z][A-Za-z0-9+.-]*://\S+$")
+_BARE_HOST = re.compile(
+    r"^[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+(?::\d{1,5})?/?$"
+)
 
 log = logging.getLogger("rastrolog")
 
@@ -161,6 +164,9 @@ def parse(
     except ValueError as exc:
         raise typer.BadParameter(str(exc), param_hint="--since") from exc
     for path in files:
+        if path.is_dir():
+            err.print(f"[err]✗[/] cannot read [bold]{escape(str(path))}[/]: is a directory")
+            raise typer.Exit(EXIT_USAGE)
         if not path.is_file():
             err.print(f"[err]✗[/] cannot read [bold]{escape(str(path))}[/]: file not found")
             raise typer.Exit(EXIT_USAGE)
@@ -242,6 +248,16 @@ def check(
 def _print_match(console: Console, value: str, match: Match | None) -> None:
     if match is None:
         console.print(Text.assemble(("no match  ", "warn"), (value, "muted")))
+        val = value.strip()
+        if _BARE_HOST.match(val):
+            host = val.rstrip("/")
+            console.print(
+                Text.assemble(
+                    ('did you mean "', "muted"),
+                    (f"https://{host}/", "accent"),
+                    ('"?', "muted"),
+                )
+            )
         return
     grid = Table.grid(padding=(0, 2))
     grid.add_column(style="muted")

@@ -196,3 +196,42 @@ def test_check_does_not_crash_on_markup_looking_value() -> None:
     result = runner.invoke(app, ["check", "[/b]"])
     assert result.exit_code == 1
     assert "[/b]" in result.stdout
+
+
+def test_parse_directory_argument_says_is_a_directory(tmp_path: Path) -> None:
+    directory = tmp_path / "logs"
+    directory.mkdir()
+    result = runner.invoke(app, ["parse", str(directory)])
+    assert result.exit_code == 2
+    assert "is a directory" in result.stderr
+    assert "file not found" not in result.stderr
+
+
+def test_parse_directory_with_markup_characters_renders_verbatim(tmp_path: Path) -> None:
+    directory = tmp_path / "bad[dir]"
+    directory.mkdir()
+    result = runner.invoke(app, ["parse", str(directory)])
+    assert result.exit_code == 2
+    assert "bad[dir]" in result.stderr
+    assert "is a directory" in result.stderr
+
+
+def test_check_bare_host_shows_hint() -> None:
+    result = runner.invoke(app, ["check", "chatgpt.com"])
+    assert result.exit_code == 1
+    assert "no match" in result.stdout
+    assert 'did you mean "https://chatgpt.com/"?' in result.stdout
+
+
+def test_check_bare_host_with_trailing_slash_shows_hint() -> None:
+    result = runner.invoke(app, ["check", "chatgpt.com/"])
+    assert result.exit_code == 1
+    assert "no match" in result.stdout
+    assert 'did you mean "https://chatgpt.com/"?' in result.stdout
+
+
+def test_check_user_agent_no_match_has_no_hint() -> None:
+    result = runner.invoke(app, ["check", "UnknownBot/1.0"])
+    assert result.exit_code == 1
+    assert "no match" in result.stdout
+    assert "did you mean" not in result.stdout
