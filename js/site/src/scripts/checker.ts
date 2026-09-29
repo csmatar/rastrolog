@@ -11,6 +11,8 @@ import { fmt, fmtParts, plural } from "../i18n/format.ts";
 import { readCheckParam, reportUrl, siteOf } from "../lib/check-param.ts";
 import {
   countVerdicts,
+  type FileMark,
+  fileMark,
   groupVerdicts,
   headlineVars,
   type LlmsSource,
@@ -22,7 +24,7 @@ import {
   summarize,
 } from "../lib/checker-model.ts";
 import { type FileOutcome, fetchSiteFile } from "../lib/site-fetch.ts";
-import { f, fromTemplate, GLYPH, q, reveal, setParts } from "./dom.ts";
+import { FILE_MARK, f, fromTemplate, GLYPH, q, reveal, setParts } from "./dom.ts";
 import { CHECKER_RESET, CHECKER_RESULT, type CheckerResult, emit } from "./events.ts";
 import { readStrings } from "./strings.ts";
 
@@ -75,9 +77,23 @@ async function check(raw: string): Promise<void> {
   else askForPaste(robots);
 }
 
+function setMark(el: HTMLElement, mark: FileMark): void {
+  el.dataset.mark = mark;
+  el.textContent = FILE_MARK[mark];
+}
+
 function setLlms(source: LlmsSource): void {
   f(result, "llms").textContent = llmsLine(source, S.lang, t);
-  f(result, "llms-paste").hidden = source.kind !== "unreachable";
+  setMark(f(result, "llms-mark"), fileMark(source));
+  const unreachable = source.kind === "unreachable";
+  f(result, "llms-paste-item").hidden = !unreachable;
+  if (!unreachable) showLlmsPaste(false);
+}
+
+function showLlmsPaste(open: boolean): void {
+  f(result, "llms-paste").hidden = !open;
+  f(result, "llms-paste-toggle").setAttribute("aria-expanded", String(open));
+  if (open) f<HTMLTextAreaElement>(result, "llms-text").focus();
 }
 
 function render(text: string | null, source: RobotsSource): void {
@@ -86,6 +102,7 @@ function render(text: string | null, source: RobotsSource): void {
   const verdicts = checkRobots(text);
   const counts = countVerdicts(verdicts);
   f(result, "robots").textContent = robotsLine(source, S.lang, t);
+  setMark(f(result, "robots-mark"), fileMark(source));
   setParts(f(result, "headline"), fmtParts(t.headline, headlineVars(counts, site, S.lang)), {
     allowed: "text-ok",
   });
@@ -172,6 +189,10 @@ form.addEventListener("submit", (event) => {
 f(paste, "run").addEventListener("click", () => {
   const text = f<HTMLTextAreaElement>(paste, "text").value;
   render(text, { kind: "pasted", text });
+});
+
+f(result, "llms-paste-toggle").addEventListener("click", () => {
+  showLlmsPaste(f(result, "llms-paste").hidden === true);
 });
 
 f(result, "llms-run").addEventListener("click", () => {

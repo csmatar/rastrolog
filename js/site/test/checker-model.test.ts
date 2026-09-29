@@ -7,6 +7,7 @@ import { fmt } from "../src/i18n/format.ts";
 import {
   countLines,
   countVerdicts,
+  fileMark,
   groupVerdicts,
   headlineVars,
   llmsLine,
@@ -188,14 +189,25 @@ describe("file status lines", () => {
     expect(llmsLine({ kind: "missing", status: 404 }, "en", t)).toBe("No llms.txt");
     expect(llmsLine({ kind: "html", status: 200 }, "en", t)).toBe("No llms.txt");
     expect(llmsLine({ kind: "server-error", status: 502 }, "en", t)).toBe("No llms.txt");
-    expect(llmsLine({ kind: "unreachable" }, "en", t)).toBe(
-      "llms.txt · couldn't be read from the browser",
-    );
+    expect(llmsLine({ kind: "unreachable" }, "en", t)).toBe("llms.txt · couldn't be read");
   });
 
   it("countLines ignores one trailing newline", () => {
     expect([countLines(""), countLines("a"), countLines("a\n"), countLines("a\r\nb\rc\n")]).toEqual(
       [0, 1, 1, 3],
     );
+  });
+});
+
+describe("file status marks", () => {
+  it.each([
+    [{ kind: "found", status: 200, text: "x" }, "ok"],
+    [{ kind: "pasted", text: "x" }, "ok"],
+    [{ kind: "missing", status: 404 }, "none"],
+    [{ kind: "html", status: 200 }, "none"],
+    [{ kind: "server-error", status: 503 }, "warn"],
+    [{ kind: "unreachable" }, "warn"],
+  ] as const)("%j -> %s", (source, mark) => {
+    expect(fileMark(source)).toBe(mark);
   });
 });

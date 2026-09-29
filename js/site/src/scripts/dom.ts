@@ -47,3 +47,6 @@ export function reveal(el: Element): void {
 }
 
 export const GLYPH = { allowed: "✓", blocked: "✕", partial: "◐" } as const;
+
+/** Beside a file status line: read, absent, unreadable. */
+export const FILE_MARK = { ok: "✓", none: "–", warn: "!" } as const;

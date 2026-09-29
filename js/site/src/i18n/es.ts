@@ -79,7 +79,7 @@ export const es: Strings = {
       pasted: "llms.txt · pegado · {links}",
       links: { one: "1 enlace", other: "{n} enlaces" },
       missing: "Sin llms.txt",
-      unreachable: "llms.txt · no se pudo leer desde el navegador",
+      unreachable: "llms.txt · no se pudo leer",
       pasteSummary: "Pegar llms.txt",
       pasteLabel: "Contenido de llms.txt",
       pasteButton: "Leer llms.txt",

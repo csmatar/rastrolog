@@ -74,7 +74,7 @@ export const en = {
       pasted: "llms.txt · pasted · {links}",
       links: { one: "1 link", other: "{n} links" },
       missing: "No llms.txt",
-      unreachable: "llms.txt · couldn't be read from the browser",
+      unreachable: "llms.txt · couldn't be read",
       pasteSummary: "Paste llms.txt instead",
       pasteLabel: "llms.txt contents",
       pasteButton: "Read llms.txt",

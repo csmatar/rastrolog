@@ -164,6 +164,15 @@ export function countLines(text: string): number {
 export type RobotsSource = FileOutcome | { kind: "pasted"; text: string };
 export type LlmsSource = FileOutcome | { kind: "pasted"; text: string };
 
+/** The mark beside a file status line: read, absent (or not a real file), or unreadable. */
+export type FileMark = "ok" | "none" | "warn";
+
+export function fileMark(source: RobotsSource): FileMark {
+  if (source.kind === "found" || source.kind === "pasted") return "ok";
+  if (source.kind === "missing" || source.kind === "html") return "none";
+  return "warn";
+}
+
 export function robotsLine(source: RobotsSource, lang: Lang, t: T): string {
   switch (source.kind) {
     case "found":

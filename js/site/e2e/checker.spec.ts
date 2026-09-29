@@ -32,6 +32,9 @@ test("found robots.txt and llms.txt: headline, summary, table and a shareable UR
   );
   await expect(field(page, "robots")).toHaveText("robots.txt · 200 · 17 lines");
   await expect(field(page, "llms")).toHaveText('llms.txt · 200 · "Example Docs" · 12 links');
+  await expect(field(page, "robots-mark")).toHaveText("✓");
+  await expect(field(page, "robots-mark")).toHaveCSS("color", "rgb(6, 122, 80)");
+  await expect(field(page, "llms-mark")).toHaveText("✓");
   await expect(field(page, "summary").locator("li").first()).toContainText(
     "OpenAI, Google, Common Crawl, and ByteDance can't collect training data from example.com.",
   );
@@ -52,6 +55,8 @@ test("404: every crawler allowed by default, and no llms.txt", async ({ page }) 
     "robots.txt · 404 · none, so every crawler is allowed by default",
   );
   await expect(field(page, "llms")).toHaveText("No llms.txt");
+  await expect(field(page, "robots-mark")).toHaveText("–");
+  await expect(field(page, "llms-paste-toggle")).toBeHidden();
 });
 
 test("403 counts as no robots.txt, and a web page is not a robots.txt", async ({ page }) => {
@@ -90,8 +95,25 @@ test("CORS refusal: explain, then check what the visitor pastes", async ({ page 
   await paste.getByLabel("robots.txt contents").fill(ROBOTS_SAMPLE);
   await paste.getByRole("button", { name: "Check pasted text" }).click();
   await expect(field(page, "robots")).toHaveText("robots.txt · pasted · 17 lines");
-  await expect(field(page, "llms")).toHaveText("llms.txt · couldn't be read from the browser");
-  await report(page).getByText("Paste llms.txt instead").click();
+  await expect(field(page, "llms")).toHaveText("llms.txt · couldn't be read");
+  await expect(field(page, "llms-mark")).toHaveText("!");
+  const toggle = report(page)
+    .locator("ul")
+    .first()
+    .getByRole("button", { name: "Paste llms.txt instead" });
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  if (test.info().project.name === "desktop") {
+    const again = await report(page)
+      .getByRole("link", { name: "Check another site" })
+      .boundingBox();
+    const box = await toggle.boundingBox();
+    // Same line: the boxes overlap vertically (the button is 44px tall, the link one text line).
+    expect(box?.y ?? 0).toBeLessThan((again?.y ?? 0) + (again?.height ?? 0));
+    expect((box?.y ?? 0) + (box?.height ?? 0)).toBeGreaterThan(again?.y ?? 0);
+    expect(box?.x ?? 0).toBeGreaterThan(again?.x ?? 0);
+  }
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
   await report(page).getByLabel("llms.txt contents").fill(LLMS_SAMPLE);
   await report(page).getByRole("button", { name: "Read llms.txt" }).click();
   await expect(field(page, "llms")).toHaveText("llms.txt · pasted · 12 links");
