@@ -40,6 +40,8 @@
   --color-term-prompt: #f25d94;
   --color-term-ok: #3ddc97;
   --color-term-focus: #a58bff;
+  --color-term-attr: #a58bff;
+  --color-term-muted: #a29db2;
 
   --font-*: initial;
   --font-mono: var(--font-jetbrains-mono);

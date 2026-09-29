@@ -21,7 +21,7 @@ const t = strings(lang).install;
     <div class="flex flex-col gap-2.5">
       <h3 class="m-0 text-base font-semibold md:text-[17px]">{t.snippetTitle}</h3>
       <p class="m-0 text-[15px] text-muted">{t.snippetBefore} <code class="font-mono text-ink">ai_referral</code> {t.snippetAfter}</p>
-      <CodeBlock lines={[PINNED_SNIPPET_TAG]} copy={t.copy} copied={t.copied} />
+      <CodeBlock lines={[PINNED_SNIPPET_TAG]} highlight copy={t.copy} copied={t.copied} />
     </div>
   </div>
 </section>

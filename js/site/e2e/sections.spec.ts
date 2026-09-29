@@ -17,6 +17,17 @@ test("install commands copy, with a visible Copied state", async ({ page }) => {
   const block = page.locator("#install button").first().locator("xpath=..");
   await expect(block).toHaveCSS("background-color", "rgb(23, 21, 30)");
   await expect(block.locator("code")).toHaveCSS("color", "rgb(236, 234, 243)");
+  const tag = page.locator("#install code").last();
+  await expect(tag.getByText("script", { exact: true }).first()).toHaveCSS(
+    "color",
+    "rgb(242, 93, 148)",
+  );
+  await expect(tag.getByText("integrity", { exact: true })).toHaveCSS(
+    "color",
+    "rgb(165, 139, 255)",
+  );
+  const copied = await page.locator("#install button").last().getAttribute("data-copy");
+  expect(copied).toBe(await tag.textContent());
 });
 
 test("what it detects: every crawler token links to its documentation", async ({ page }) => {
