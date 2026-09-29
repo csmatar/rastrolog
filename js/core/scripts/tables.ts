@@ -2,13 +2,15 @@
 // compact tables. Full JSON Schema validation stays in pre-commit and the
 // Python suite. Erasable TypeScript only: this runs under Node's type stripping.
 import { normalizeHost } from "../src/host.ts";
-import type { CrawlerRow, Purpose, ReferrerRow } from "../src/types.ts";
+import type { CrawlerRow, Purpose, ReferrerRow, TokenRow } from "../src/types.ts";
 
 const PURPOSES: readonly string[] = ["training", "user_fetch", "search_index"];
 
 export interface Tables {
   referrers: ReferrerRow[];
   crawlers: CrawlerRow[];
+  /** Every crawler in signals.json order, robots_only included. */
+  all: TokenRow[];
 }
 
 function fail(message: string): never {
@@ -44,6 +46,7 @@ export function buildTables(signals: unknown): Tables {
   };
 
   const crawlers: CrawlerRow[] = [];
+  const all: TokenRow[] = [];
   list(root, "crawlers", "root").forEach((raw, i) => {
     const where = `crawlers[${i}]`;
     const c = record(raw, where);
@@ -58,6 +61,15 @@ export function buildTables(signals: unknown): Tables {
     const aiSpecific = c.ai_specific;
     if (typeof aiSpecific !== "boolean") fail(`${where}.ai_specific must be a boolean`);
     const token = text(c, "token", where);
+    all.push([
+      id,
+      text(c, "vendor", where),
+      text(c, "vendor_name", where),
+      token,
+      purpose as Purpose,
+      aiSpecific,
+      match === "robots_only",
+    ]);
     if (match === "user_agent") {
       crawlers.push([
         id,
@@ -97,12 +109,12 @@ export function buildTables(signals: unknown): Tables {
       normalized,
     ];
   });
-  return { referrers, crawlers };
+  return { referrers, crawlers, all };
 }
 
 export function renderModule(
   constName: string,
-  typeName: "ReferrerRow" | "CrawlerRow",
+  typeName: "ReferrerRow" | "CrawlerRow" | "TokenRow",
   rows: readonly unknown[],
 ): string {
   const body = rows.map((row) => `  ${JSON.stringify(row)},`).join("\n");

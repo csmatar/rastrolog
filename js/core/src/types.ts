@@ -35,3 +35,14 @@ export type CrawlerRow = readonly [
   purpose: Purpose,
   aiSpecific: boolean,
 ];
+
+/** Every crawler in signals.json order, including robots.txt-only tokens (for the robots checker). */
+export type TokenRow = readonly [
+  id: string,
+  vendor: string,
+  vendorName: string,
+  token: string,
+  purpose: Purpose,
+  aiSpecific: boolean,
+  robotsOnly: boolean,
+];

@@ -98,6 +98,19 @@ describe("buildTables", () => {
     const uaIds = real.crawlers.filter((c) => c.match === "user_agent").map((c) => c.id);
     expect(crawlers.map((row) => row[0]).sort()).toEqual([...uaIds].sort());
     expect(referrers.map((row) => row[0])).toEqual(real.referrers.map((r) => r.id));
+    expect(buildTables(real).all.map((row) => row[0])).toEqual(real.crawlers.map((c) => c.id));
+  });
+
+  it("all keeps every crawler in file order, flagging robots_only", () => {
+    const { all } = buildTables(
+      signals({
+        crawlers: [crawler("a", "Bot"), crawler("c", "Ext-Token", { match: "robots_only" })],
+      }),
+    );
+    expect(all).toEqual([
+      ["a", "v", "V", "Bot", "training", true, false],
+      ["c", "v", "V", "Ext-Token", "training", true, true],
+    ]);
   });
 });
 
