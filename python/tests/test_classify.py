@@ -1,3 +1,4 @@
+import time
 from dataclasses import FrozenInstanceError
 
 import pytest
@@ -142,3 +143,25 @@ def test_long_user_agents_still_classify_but_bypass_the_cache() -> None:
     assert match is not None
     assert match.id == "openai-gptbot"
     assert _classify_user_agent.cache_info().currsize == before
+
+
+def test_many_label_hosts_classify_in_linear_time() -> None:
+    """Only suffixes as long as the longest listed host can match, so a hostile
+    Referer with thousands of labels must not cost quadratic time (GHSA-j9gx-mm38-pr3j)."""
+    url = "https://" + "a." * 20_000 + "com/"
+    started = time.perf_counter()
+    assert classify_referrer(url) is None
+    assert time.perf_counter() - started < 0.2  # was ~2.3 s before the fix
+
+
+@pytest.mark.parametrize(
+    ("host", "expected_id"),
+    [
+        ("x." * 1_000 + "notebooklm.google.com", "notebooklm"),  # longest listed host (3 labels)
+        ("x." * 1_000 + "chatgpt.com", "chatgpt"),
+        ("x." * 1_000 + "com", None),
+    ],
+)
+def test_deep_subdomains_still_match(host: str, expected_id: str | None) -> None:
+    match = classify_referrer(f"https://{host}/")
+    assert (match.id if match else None) == expected_id
