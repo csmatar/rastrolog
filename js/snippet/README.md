@@ -11,7 +11,9 @@ One script tag, under 2 KB gzipped. It reads `document.referrer`, and when a vis
 `@0` always serves the latest 0.x release, so new AI products are picked up automatically. For Subresource Integrity, pin an exact version instead:
 
 <!-- rastrolog:sri:start -->
-The pinned tag with its `integrity` hash is written here when the first npm release (0.2.0) is published.
+```html
+<script src="https://cdn.jsdelivr.net/npm/rastrolog@0.2.0/dist/snippet.min.js" integrity="sha384-f1WmE4FFMG3T7OCN/djpfKWMNHW3DxGQ3dICa4ZZlIlqLgLnzr4Yzfs0SFK0Wzdm" crossorigin="anonymous" defer></script>
+```
 <!-- rastrolog:sri:end -->
 
 ## What your analytics receives

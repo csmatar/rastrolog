@@ -1,6 +1,6 @@
 {
   "name": "rastrolog",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Spot visitors from ChatGPT, Claude, Perplexity and other AI chat products, and send them to the analytics you already run. One script tag, under 2 KB.",
   "keywords": [
     "ai",
