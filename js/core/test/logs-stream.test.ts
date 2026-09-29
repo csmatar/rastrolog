@@ -104,6 +104,27 @@ describe("file-level behaviour matches Python", () => {
     }
   });
 
+  it("a realistic truncated gzip keeps exactly what Python keeps", async () => {
+    // 1,000 lines gzipped by Python with its last 12 bytes cut off; Python's
+    // iter_records reads 999 lines and 999 records from it and marks it truncated.
+    const cut = new Uint8Array(
+      readFileSync(new URL("./fixtures/truncated-1000.log.gz", import.meta.url)),
+    );
+    // File.stream() hands over chunks of tens of KiB: there the count is exact.
+    for (const chunk of [4096, cut.length]) {
+      expect(await paths(cut, chunk)).toMatchObject({
+        lines: 999,
+        records: 999,
+        skipped: 0,
+        truncated: true,
+      });
+    }
+    // With tiny chunks Node's DecompressionStream drops a little buffered output (README gap).
+    const tiny = await paths(cut, 7);
+    expect(tiny.truncated).toBe(true);
+    expect(tiny.records).toBeGreaterThanOrEqual(990);
+  });
+
   it("reads every member of a concatenated gzip (Review Focus 2)", async () => {
     const a = gzipSync(enc.encode(`${LINE}\n`));
     const b = gzipSync(enc.encode(`${LINE.replace("/a", "/c")}\n`));
