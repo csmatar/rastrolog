@@ -21,7 +21,7 @@
     "@playwright/test": "^1.62.0",
     "@rastrolog/core": "workspace:*",
     "@tailwindcss/vite": "^4.3.3",
-    "astro": "^7.3.3",
+    "astro": "^7.3.5",
     "rastrolog": "workspace:*",
     "tailwindcss": "^4.3.3"
   }
