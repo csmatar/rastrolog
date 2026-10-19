@@ -18,10 +18,10 @@
     "@fontsource-variable/ibm-plex-sans": "^5.3.0",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@lhci/cli": "^0.15.1",
-    "@playwright/test": "^1.62.0",
+    "@playwright/test": "^1.64.0",
     "@rastrolog/core": "workspace:*",
     "@tailwindcss/vite": "^4.3.3",
-    "astro": "^7.3.3",
+    "astro": "^7.3.8",
     "rastrolog": "workspace:*",
     "tailwindcss": "^4.3.3"
   }
